@@ -14,10 +14,16 @@ To set up and run this backend API for StoryShare, follow these steps:
 
    - Create a SQLite database file named `db.sqlite` in the `./storage/` directory. You can use a SQLite client to create this database.
 
-4. **Run the Application:**
+4. **Build this image:**
 
    ```shell
-   python index.py
+   docker build -t storyshare-backend:latest .
+   ```
+
+5. **Run the Application:**
+
+   ```shell
+   docker run -p 55522:5000 storyshare-backend
    ```
 
    The API will start running on `http://localhost:5000`.
