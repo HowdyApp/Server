@@ -8,16 +8,7 @@ To set up and run this backend API for StoryShare, follow these steps:
 
 1. **Clone the Repository:**
 
-   ```shell
-   git clone <repository_url>
-   cd <repository_directory>
-   ```
-
 2. **Install Dependencies:**
-
-   ```shell
-   pip install -r requirements.txt
-   ```
 
 3. **Database Configuration:**
 
@@ -26,7 +17,7 @@ To set up and run this backend API for StoryShare, follow these steps:
 4. **Run the Application:**
 
    ```shell
-   python app.py
+   python index.py
    ```
 
    The API will start running on `http://localhost:5000`.
