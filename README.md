@@ -1,77 +1,149 @@
-# StoryShare Backend
+# StoryShare Backend API
 
-Welcome to the StoryShare backend repository. In this README, you will find the latest updates on API endpoints and domain information for StoryShare.
+This is the backend API for StoryShare, developed by ORAE IBC. StoryShare is a platform for sharing stories and images with friends. This API provides the necessary functionality for user accounts, friend management, and image sharing within the StoryShare application.
 
-## Todo
-### /friends/list
-- **Description:** List all your friends.
-- **Requires:** [Authentication](#authentication)
+## Installation and Setup
 
-## Domains
+To set up and run this backend API for StoryShare, follow these steps:
 
-StoryShare Backend is accessible at the following domain: [https://api.storyshare.orae.one/](https://api.storyshare.orae.one/)
+1. **Clone the Repository:**
 
-## API Endpoints
+   ```shell
+   git clone <repository_url>
+   cd <repository_directory>
+   ```
 
-### /home
-- **Description:** Connects the user to the homepage.
-- **Requires:** [Authentication](#authentication)
+2. **Install Dependencies:**
 
-### /home/(friend)/(image)
-- **Description:** Connect to a sent image.
-- **Requires:** [Authentication](#authentication)
+   ```shell
+   pip install -r requirements.txt
+   ```
 
-### /account/register
-- **Description:** Register a new account.
-- **Body Parameters:** [username, mail, pasw]
+3. **Database Configuration:**
 
-### /account/login
-- **Description:** Authenticate the user.
-- **Body Parameters:** [mail, pasw]
+   - Create a SQLite database file named `db.sqlite` in the `./storage/` directory. You can use a SQLite client to create this database.
 
-### /account/delete
-- **Description:** Delete the account.
-- **Requires:** [Authentication](#authentication)
-- **Body Parameters:** [pasw]
+4. **Run the Application:**
 
-### /cam/new
-- **Description:** Create a new story.
-- **Requires:** [Authentication](#authentication)
-- **Body Parameters:** [[img](#encoding)]
+   ```shell
+   python app.py
+   ```
 
-### /friend/add
-- **Description:** Add a friend.
-- **Requires:** [Authentication](#authentication)
-- **Body Parameters:** [friend]
+   The API will start running on `http://localhost:5000`.
 
-### /friend/accept
-- **Description:** Accept a active friend request
-- **Requires:** [Authenication](#authentication)
-- **Body Parameters:** [friend]
+## Usage
 
-### /friend/remove
-- **Description:** Remove a active friendship
-- **Requires:** [Authenication](#authentication)
-- **Body Parameters:** [friend]
+Once the StoryShare Backend API is up and running, you can interact with it using HTTP requests. Below, you'll find a list of available API endpoints and their descriptions.
 
-## Authentication
+## User Account Management
 
-To access the API, you need an API Token, which you can acquire by following these steps:
-1. Initiate an API request to [/register](#accountregister), or use [/login](#accountlogin).
-2. You will receive a response with a parameter: token=(sessionToken).
-3. Use this token in the authorization header of your requests to access the unlocked endpoints.
+### Register User
 
-## Encryption
+- **Endpoint:** `/account/register`
+- **Method:** `POST`
+- **Description:** Register a new user account.
+- **Request Body:** JSON containing `user`, `mail`, and `pasw` (password).
+- **Response:** User registration status and a JWT token on success.
 
-We are committed to implementing end-to-end encryption for our app. Once you have authenticated, the sessionToken will automatically serve as the encryption token for your communications.
+### User Login
 
-## Encoding
+- **Endpoint:** `/account/login`
+- **Method:** `POST`
+- **Description:** Log in an existing user.
+- **Request Body:** JSON containing `mail` and `pasw` (password).
+- **Response:** User login status and a JWT token on success.
 
-We encode our images using Base64 when sending a POST request to the server. For example, when uploading a photo in the [/new](#camnew) request, include the [img] parameter in the request body with the base64-encoded image.
+### Get User Information
 
+- **Endpoint:** `/account/me`
+- **Method:** `POST`
+- **Description:** Get information about the currently authenticated user.
+- **Request Headers:** `auth` (JWT token).
+- **Response:** User information.
 
-## Questions?
+### Delete User Account
 
-Do you want to know more about the backend api? You can create a [Issue] on this repo.
+- **Endpoint:** `/account/delete`
+- **Method:** `POST`
+- **Description:** Delete the user's account.
+- **Request Body:** JSON containing `pasw` (password).
+- **Request Headers:** `auth` (JWT token).
+- **Response:** Account deletion status.
 
-Thank you!
+## Friendship Management
+
+### Add Friend
+
+- **Endpoint:** `/friends/add`
+- **Method:** `POST`
+- **Description:** Send a friend request to another user.
+- **Request Body:** JSON containing `friend` (username of the friend to add).
+- **Request Headers:** `auth` (JWT token).
+- **Response:** Friend request status.
+
+### Accept Friend Request
+
+- **Endpoint:** `/friends/accept`
+- **Method:** `POST`
+- **Description:** Accept a pending friend request.
+- **Request Body:** JSON containing `friend` (username of the friend to accept).
+- **Request Headers:** `auth` (JWT token).
+- **Response:** Friend request acceptance status.
+
+### Reject Friend Request
+
+- **Endpoint:** `/friends/reject`
+- **Method:** `POST`
+- **Description:** Reject a pending friend request.
+- **Request Body:** JSON containing `friend` (username of the friend to reject).
+- **Request Headers:** `auth` (JWT token).
+- **Response:** Friend request rejection status.
+
+### Remove Friend
+
+- **Endpoint:** `/friend/remove`
+- **Method:** `POST`
+- **Description:** Remove a friend from the user's friend list.
+- **Request Body:** JSON containing `friend` (username of the friend to remove).
+- **Request Headers:** `auth` (JWT token).
+- **Response:** Friend removal status.
+
+### Get Friend Information
+
+- **Endpoint:** `/friends/info`
+- **Method:** `POST`
+- **Description:** Get information about a friend, including their name and status.
+- **Request Body:** JSON containing `FriendID` (the ID of the friend to get information about).
+- **Request Headers:** `auth` (JWT token).
+- **Response:** Friend information, including name and status.
+
+### List Friends
+
+- **Endpoint:** `/friends/list`
+- **Method:** `GET`
+- **Description:** Get a list of all friends and friend requests for the authenticated user.
+- **Request Headers:** `auth` (JWT token).
+- **Response:** List of friends and friend requests.
+
+## Image Sharing
+
+### Upload Image
+
+- **Endpoint:** `/cam/new`
+- **Method:** `POST`
+- **Description:** Upload a new image.
+- **Request Body:** JSON containing `img` (image data).
+- **Request Headers:** `auth` (JWT token).
+- **Response:** Image upload status.
+
+### View Image
+
+- **Endpoint:** `/home/<friend>/<image>`
+- **Method:** `GET`
+- **Description:** View a specific image associated with a friend.
+- **Request Headers:** `auth` (JWT token).
+- **Response:** The requested image file or a "Not Found" message if the image does not exist.
+
+## License
+
+This code is licensed under the ORAE License. For more details, please visit [ORAE License](https://orae.one/license).
