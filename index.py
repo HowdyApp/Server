@@ -116,7 +116,7 @@ class account:
         try:
             data = request.get_json()
             mail = data['mail']
-            pasw = data['pasw'].encode()
+            pasw = data['pasw']
 
             with sqlite3.connect(DATABASE) as con:
                 c1 = con.execute('SELECT userid FROM auth WHERE mail = ?', (mail,))
