@@ -83,7 +83,7 @@ class account:
 
         username = data['user']
         mailadrs = data['mail']
-        password = new.password.encrypt(data['pasw'].encode('utf-8'))
+        password = new.password.encrypt(data['pasw'])
 
         UserID = new.token.user(username, mailadrs)
         with sqlite3.connect(DATABASE) as con:

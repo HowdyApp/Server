@@ -36,6 +36,6 @@ class password:
             if isinstance(database, str):
                 database = database.encode()
 
-            return bcrypt.checkpw(password, database)
+            return bcrypt.hashpw(password, database)
         except Exception as e:
             raise e
