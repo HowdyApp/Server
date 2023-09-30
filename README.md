@@ -34,7 +34,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Method:** `POST`
 - **Description:** Register a new user account.
 - **Request Body:** JSON containing `user`, `mail`, and `pasw` (password).
-- **Response:** User registration status and a JWT token on success.
+- **Response:** User registration status and a token on success.
 
 ### User Login
 
@@ -42,14 +42,14 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Method:** `POST`
 - **Description:** Log in an existing user.
 - **Request Body:** JSON containing `mail` and `pasw` (password).
-- **Response:** User login status and a JWT token on success.
+- **Response:** User login status and a token on success.
 
 ### Get User Information
 
 - **Endpoint:** `/account/me`
 - **Method:** `POST`
 - **Description:** Get information about the currently authenticated user.
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** User information.
 
 ### Delete User Account
@@ -58,7 +58,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Method:** `POST`
 - **Description:** Delete the user's account.
 - **Request Body:** JSON containing `pasw` (password).
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** Account deletion status.
 
 ## Friendship Management
@@ -69,7 +69,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Method:** `POST`
 - **Description:** Send a friend request to another user.
 - **Request Body:** JSON containing `friend` (username of the friend to add).
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** Friend request status.
 
 ### Accept Friend Request
@@ -78,7 +78,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Method:** `POST`
 - **Description:** Accept a pending friend request.
 - **Request Body:** JSON containing `friend` (username of the friend to accept).
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** Friend request acceptance status.
 
 ### Reject Friend Request
@@ -87,7 +87,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Method:** `POST`
 - **Description:** Reject a pending friend request.
 - **Request Body:** JSON containing `friend` (username of the friend to reject).
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** Friend request rejection status.
 
 ### Remove Friend
@@ -96,7 +96,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Method:** `POST`
 - **Description:** Remove a friend from the user's friend list.
 - **Request Body:** JSON containing `friend` (username of the friend to remove).
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** Friend removal status.
 
 ### Get Friend Information
@@ -105,7 +105,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Method:** `POST`
 - **Description:** Get information about a friend, including their name and status.
 - **Request Body:** JSON containing `FriendID` (the ID of the friend to get information about).
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** Friend information, including name and status.
 
 ### List Friends
@@ -113,7 +113,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Endpoint:** `/friends/list`
 - **Method:** `GET`
 - **Description:** Get a list of all friends and friend requests for the authenticated user.
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** List of friends and friend requests.
 
 ## Image Sharing
@@ -124,7 +124,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Method:** `POST`
 - **Description:** Upload a new image.
 - **Request Body:** JSON containing `img` (image data).
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** Image upload status.
 
 ### View Image
@@ -132,7 +132,7 @@ Once the StoryShare Backend API is up and running, you can interact with it usin
 - **Endpoint:** `/home/<friend>/<image>`
 - **Method:** `GET`
 - **Description:** View a specific image associated with a friend.
-- **Request Headers:** `auth` (JWT token).
+- **Request Headers:** `auth` (token).
 - **Response:** The requested image file or a "Not Found" message if the image does not exist.
 
 ## License
