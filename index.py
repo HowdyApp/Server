@@ -379,14 +379,14 @@ class friends:
             c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (FriendID,))
             c2 = con.execute('SELECT Status FROM requests WHERE (SenderID = ? AND RecieveID = ?);', (FriendID, UserID,))
             c3 = con.execute('SELECT Status FROM requests WHERE (SenderID = ? AND RecieveID = ?);', (UserID, FriendID,))
-            if c2.fetchone() != None: r2 = 'Ontvangen!'
-            elif c3.fetchone() != None: r2 = 'Verzonden!'
+            if c2.fetchone() != None: r2 = 1 # Recieved
+            elif c3.fetchone() != None: r2 = 2 # Sent
             else: r2 = None
             if r2 == None:
                 c2 = con.execute('SELECT 1 FROM friends WHERE (User = ? AND Friend = ?) OR (User = ? AND Friend = ?);', (UserID, FriendID, FriendID, UserID))
                 r2 = c2.fetchone()
                 if r2 == True:
-                    r2 = 'Active!'
+                    r2 = 3 # Active friend
             r1 = c1.fetchone()[0]
         
         return jsonify(
