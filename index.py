@@ -362,6 +362,33 @@ class friends:
             msg = 'Friend is removed!'
         )
     
+    @app.route('/friends/cancel', methods=['POST'])
+    def cancelRequest():
+        data = request.get_json()
+        Friend = data['friend']
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+
+        if(UserID is None): return jsonify(
+            msg = 'Unauthorized!',
+            code = 'unauthorized',
+        ), 401
+        with sqlite3.connect(DATABASE) as con:
+            try:
+                con.execute('DELETE FROM requests WHERE SenderID = ? AND RecieveID = ?', (UserID, Friend,))
+            except:
+                return jsonify(
+                    code='failed',
+                    msg = 'Failed to delete friend.'
+                ) 
+        
+        return jsonify(
+            code = 'request_canceled',
+            msg = 'Request is canceled!'
+        )
+
+
+
     @app.route('/friends/info', methods=['POST'])
     def getinfo():
         data = request.get_json()
