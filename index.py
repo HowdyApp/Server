@@ -308,7 +308,7 @@ class friends:
             c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = ?)', (FriendID,))
             r1 = c1.fetchone()[0]
             if (r1 == True):
-                con.execute('DELETE FROM requests WHERE RecieveID = ?', UserID)
+                con.execute('DELETE FROM requests WHERE RecieveID = ?', (UserID,))
                 con.execute('INSERT INTO friends (User, Friend, Status) VALUES (?, ?, "Accepted")', (UserID, FriendID))
 
         return jsonify(
