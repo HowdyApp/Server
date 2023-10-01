@@ -8,6 +8,7 @@ from flask import request
 from flask import jsonify
 from flask import send_file
 from flask import send_from_directory
+from flask_cors import CORS
 
 from lib import new
 from lib import log
@@ -23,6 +24,7 @@ import shutil
 DATABASE = './storage/db.sqlite'
 
 app = Flask(__name__)
+CORS(app)
 
 class home:
     @app.route('/home', methods=['GET'])
