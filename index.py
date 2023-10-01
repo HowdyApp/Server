@@ -38,15 +38,16 @@ class home:
             ), 401
         
         with sqlite3.connect(DATABASE) as con:
-            c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
-            r1 = c1.fetchall()
+            c1 = con.execute('SELECT Friend FROM friends WHERE User = ?', (UserID,))
+            c2 = con.execute('SELECT Friend FROM friends WHERE Friend = ?', (UserID,))
+            r1 = c1.fetchall() + c2.fetchall()
             friends = [row[0] for row in r1]
             pairs = []
 
             for friend in friends:
-                c2 = con.execute('SELECT ImageID FROM images WHERE UserID = ?', (friend,))
-                r2 = c2.fetchall()
-                for image_row in r2:
+                c3 = con.execute('SELECT ImageID FROM images WHERE UserID = ?', (friend,))
+                r3 = c3.fetchall()
+                for image_row in r3:
                     pairs.append(f"{friend}/{image_row[0]}")
         
         log.debug(pairs);   
@@ -341,7 +342,7 @@ class friends:
             msg = f'Friend is rejected!'
         ), 202
 
-    @app.route('/friend/remove')
+    @app.route('/friends/remove', methods=['POST'])
     def remove():
         data = request.get_json()
         Friend = data['friend']
