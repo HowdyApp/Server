@@ -438,9 +438,10 @@ class friends:
 
         with sqlite3.connect(DATABASE) as con:
             c1 = con.execute('SELECT Friend FROM friends WHERE User = ?', (UserID,))
+            c15 = con.execute('SELECT User FROM friends WHERE Friend = ?', (UserID,))
             c2 = con.execute('SELECT SenderID FROM requests WHERE RecieveID = ?', (UserID,))
             c3 = con.execute('SELECT RecieveID FROM requests WHERE SenderID = ?', (UserID,))
-            FRIENDS_NOW = [row[0] for row in c1.fetchall()]
+            FRIENDS_NOW = [row[0] for row in c1.fetchall()] + [row[0] for row in c15.fetchall()]
             FRIENDS_INVITED = [row[0] for row in c2.fetchall()]
             FRIENDS_SENDED = [row[0] for row in c3.fetchall()]
             FRIENDS_ALL = FRIENDS_NOW + FRIENDS_INVITED + FRIENDS_SENDED
