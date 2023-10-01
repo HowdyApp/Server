@@ -20,6 +20,7 @@ import base64
 import uuid
 import json
 import shutil
+import dotenv
 
 DATABASE = './storage/db.sqlite'
 
@@ -33,6 +34,14 @@ def index():
 @app.route('/download')
 def download():
     return send_file('app/storyshare.apk')
+
+@app.route('/release')
+def releases():
+    file = r'build'
+    return jsonify(
+        serverRelease = dotenv.get_key(file, 'vServer'),
+        clientRelease = dotenv.get_key(file, 'vClient')
+    ), 200
 
 class home:
     @app.route('/home', methods=['GET'])
