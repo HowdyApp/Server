@@ -11,7 +11,7 @@ jobs:
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !RunContainerStep
     name: Run Backend
-    image: storyshare-backend
+    image: storyshare-backend:latest
     args: --rm
     volumeMounts:
     - sourcePath: /root/StoryShare/app/storage
