@@ -49,9 +49,7 @@ class home:
                 r3 = c3.fetchall()
                 for image_row in r3:
                     pairs.append(f"{friend}/{image_row[0]}")
-        
-        log.debug(pairs);   
-
+    
         return jsonify(
             code = 'success',
             msg = 'Loaded all friends!',
