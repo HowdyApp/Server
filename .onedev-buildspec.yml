@@ -6,7 +6,7 @@ jobs:
     name: Build Docker
     dockerfile: Dockerfile
     tags: storyshare-backend:latest
-    publish: true
+    publish: false
     removeDanglingImages: true
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !RunContainerStep
