@@ -38,8 +38,8 @@ class home:
             ), 401
         
         with sqlite3.connect(DATABASE) as con:
-            c1 = con.execute('SELECT Friend FROM friends WHERE User = ?', (UserID,))
-            c2 = con.execute('SELECT Friend FROM friends WHERE Friend = ?', (UserID,))
+            c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
+            c2 = con.execute('SELECT User FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
             r1 = c1.fetchall() + c2.fetchall()
             friends = [row[0] for row in r1]
             pairs = []
