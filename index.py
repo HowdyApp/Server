@@ -26,6 +26,14 @@ DATABASE = './storage/db.sqlite'
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/')
+def index():
+    return send_file('web/main.html')
+
+@app.route('/download')
+def download():
+    return send_file('app/storyshare.apk')
+
 class home:
     @app.route('/home', methods=['GET'])
     def home():
