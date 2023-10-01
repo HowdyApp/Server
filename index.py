@@ -309,7 +309,7 @@ class friends:
             r1 = c1.fetchone()[0]
             if (r1 == True):
                 con.execute('DELETE FROM requests WHERE RecieveID = ?', (UserID,))
-                con.execute('INSERT INTO friends (User, Friend,) VALUES (?, ?)', (UserID, FriendID))
+                con.execute('INSERT INTO friends (User, Friend,) VALUES (?, ?,)', (UserID, FriendID))
 
         return jsonify(
             code = 'friend_accepted',
