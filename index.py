@@ -49,6 +49,8 @@ class home:
                 for image_row in r2:
                     pairs.append(f"{friend}/{image_row[0]}")
         
+        log.debug(pairs);   
+
         return jsonify(
             code = 'success',
             msg = 'Loaded all friends!',
@@ -445,6 +447,7 @@ class friends:
             FRIENDS_INVITED = [row[0] for row in c2.fetchall()]
             FRIENDS_SENDED = [row[0] for row in c3.fetchall()]
             FRIENDS_ALL = FRIENDS_NOW + FRIENDS_INVITED + FRIENDS_SENDED
+            log.debug(FRIENDS_ALL)
 
         return jsonify(
             code='accepted',
