@@ -1,0 +1,26 @@
+version: 25
+jobs:
+- name: Release
+  steps:
+  - !BuildImageStep
+    name: Build Docker
+    dockerfile: Dockerfile
+    tags: storyshare-backend:latest
+    publish: true
+    removeDanglingImages: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !RunContainerStep
+    name: Run Backend
+    image: storyshare-backend
+    args: --rm
+    volumeMounts:
+    - sourcePath: /root/StoryShare/app/storage
+      targetPath: /app/storage
+    - sourcePath: /root/StoryShare/app/images
+      targetPath: /app/images
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
