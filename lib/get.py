@@ -31,11 +31,11 @@ class password:
             if not isinstance(database, (str, bytes)):
                 raise ValueError("The database-pw must be a string or bytes")
 
-            if isinstance(password, str):
-                password = password.encode()
-            if isinstance(database, str):
-                database = database.encode()
+            if isinstance(password, bytes):
+                password = password.decode()
+            if isinstance(database, bytes):
+                database = database.decode()
 
-            return bcrypt.hashpw(password, database)
+            return bcrypt.hashpw(str(password), str(database))
         except Exception as e:
             raise e
