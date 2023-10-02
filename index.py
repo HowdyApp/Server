@@ -509,11 +509,8 @@ class message:
             time = Time,
         ), 200
     
-    @app.route('/messages/query', methods=['GET'])
+    @app.route('/messages/query/<friend>', methods=['GET'])
     def queryMessage():
-        data = request.get_json()
-        Friend = data['Friend']
-
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
