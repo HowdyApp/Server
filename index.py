@@ -476,6 +476,7 @@ class message:
     @app.route('/messages/send', methods=['POST'])
     def sendMessages():
         data = request.get_json()
+        log.debug(data)
         toUser = data['UserID']
         Content = data['Content']
         Time = datetime.datetime.now()
