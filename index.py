@@ -521,9 +521,8 @@ class message:
             ), 401
         
         with sqlite3.connect(DATABASE) as con:
-            c1 = con.execute('SELECT Path FROM messages WHERE User2 = ? AND User1 = ?', (Friend, UserID))
+            c1 = con.execute('SELECT * FROM messages WHERE User2 = ? AND User1 = ?', (Friend, UserID))
             r1 = c1.fetchone()
-            log.debug(r1)
             if r1(): return jsonify(
                 code='new_messages_available',
                 msg='New messages are available!'
