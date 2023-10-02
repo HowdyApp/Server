@@ -21,6 +21,7 @@ import uuid
 import json
 import shutil
 import dotenv
+import datetime
 
 DATABASE = './storage/db.sqlite'
 
@@ -470,6 +471,66 @@ class friends:
             msg='Loaded all friends and friend requests!',
             all=FRIENDS_ALL,
         ), 200  
+
+class message:
+    @app.route('/messages/send', methods=['POST'])
+    def sendMessages():
+        data = request.get_json()
+        toUser = data['Reciever']
+        fromUser = data['Sender']
+        Type = data['Type']
+        Content = data['Content']
+        Time = datetime.datetime.now()
+
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+
+        if UserID is None:
+            return jsonify(
+                msg='Unauthorized!',
+                code='unauthorized',
+            ), 401
+        
+        with sqlite3.connect(DATABASE) as con:
+            con.execute('INSERT INTO messages (SenderID, RecieverID, Content, Type, Time) VALUES (?, ?, ?, ?, ?)', (fromUser, toUser, Content, Type, Time))
+        
+        return jsonify(
+            code='sended',
+            msg='Your message has been sent!',
+            time = Time,
+        ), 200
+    
+    @app.route('/messages/read', methods=['GET'])
+    def readMessages():
+        data = request.get_json()
+        Friend = data['Friend']
+        Time = datetime.datetime.now()
+
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+
+        if UserID is None:
+            return jsonify(
+                msg='Unauthorized!',
+                code='unauthorized',
+            ), 401
+        
+        with sqlite3.connect(DATABASE) as con:
+            c1 = con.execute('SELECT Content, Type, Time FROM messages WHERE SenderID = ? AND RecieverID = ?', (Friend, UserID))
+            c2 = con.execute('SELECT Content, Type, Time FROM messages WHERE SenderID = ? AND RecieverID = ?', (UserID, Friend))
+            r1 = c1.fetchall()
+            r2 = c2.fetchall()
+
+            for i in r1:
+                Content = i[0]
+                Type = i[1]
+                Time = i[2]
+                log.debug(f'\n----')
+                log.debug(f'Content: {Content}')
+                log.debug(f'Type: {Type}')
+                log.debug(f'Time: {Time}')
+                log.debug(f'----\n')
+
 
 if __name__ == '__main__':
     app.run()
