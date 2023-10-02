@@ -557,16 +557,16 @@ class message:
                 ), 400
             
             con.execute('DELETE FROM messages WHERE User2 = ?', (UserID,))
-            os.remove(str(r1[0]))
 
             try:
                 return send_file(str(r1[0]))
             except FileNotFoundError:
                 return jsonify(
-                    code='no_new_filente',
+                    code='no_new_file',
                     msg='There where no new messages.'
                 ), 400
-
+            finally:
+                os.remove(str(r1[0]))
 
 if __name__ == '__main__':
     app.run()
