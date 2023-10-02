@@ -477,7 +477,6 @@ class message:
     def sendMessages():
         data = request.get_json()
         toUser = data['UserID']
-        Type = data['Type']
         Content = data['Content']
         Time = datetime.datetime.now()
 
@@ -490,11 +489,22 @@ class message:
                 code='unauthorized',
             ), 401
         
+        ImageID = uuid.uuid4()
+        ImageID = f'{ImageID}'
+        path = f'./images/{UserID}/{ImageID}.jpg'
+        directory = os.path.dirname(path)
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        with open(path, "wb") as ws:
+            ws.write(base64.decodebytes(Content))
+
         with sqlite3.connect(DATABASE) as con:
-            con.execute('INSERT INTO messages (SenderID, RecieverID, Content, Type, Time) VALUES (?, ?, ?, ?, ?)', (UserID, toUser, Content, Type, Time))
+            con.execute('INSERT INTO messages (User1, User2, Path, Time, Status) VALUES (?, ?, ?, ?, "Sent")', (UserID, toUser, path, Time,))
         
         return jsonify(
-            code='sended',
+            code='sent',
             msg='Your message has been sent!',
             time = Time,
         ), 200
@@ -503,7 +513,6 @@ class message:
     def readMessages():
         data = request.get_json()
         Friend = data['Friend']
-        Time = datetime.datetime.now()
 
         token = request.headers.get('auth')
         UserID = get.token.session(token)
@@ -515,20 +524,26 @@ class message:
             ), 401
         
         with sqlite3.connect(DATABASE) as con:
-            c1 = con.execute('SELECT Content, Type, Time FROM messages WHERE SenderID = ? AND RecieverID = ?', (Friend, UserID))
-            c2 = con.execute('SELECT Content, Type, Time FROM messages WHERE SenderID = ? AND RecieverID = ?', (UserID, Friend))
-            r1 = c1.fetchall()
-            r2 = c2.fetchall()
+            c1 = con.execute('SELECT Path FROM messages WHERE User2 = ?', (UserID))
+            r1 = c1.fetchone()
 
-            for i in r1:
-                Content = i[0]
-                Type = i[1]
-                Time = i[2]
-                log.debug(f'\n----')
-                log.debug(f'Content: {Content}')
-                log.debug(f'Type: {Type}')
-                log.debug(f'Time: {Time}')
-                log.debug(f'----\n')
+            if r1 == None:
+                return jsonify(
+                    code='no_new',
+                    msg='There where no new messages.'
+                ), 400
+            
+            con.execute('DELETE FROM messages WHERE User2 = ?', (UserID))
+            os.remove(r1)
+            
+            try:
+                return send_file(r1)
+            except FileNotFoundError:
+                return jsonify(
+                    code='no_new',
+                    msg='There where no new messages.'
+                ), 400
+            
 
 
 if __name__ == '__main__':
