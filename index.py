@@ -509,6 +509,33 @@ class message:
             time = Time,
         ), 200
     
+    @app.route('/messages/query', methods=['GET'])
+    def queryMessage():
+        data = request.get_json()
+        Friend = data['Friend']
+
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+
+        if UserID is None:
+            return jsonify(
+                msg='Unauthorized!',
+                code='unauthorized',
+            ), 401
+        
+        with sqlite3.connect(DATABASE) as con:
+            c1 = con.execute('SELECT Path FROM messages WHERE User2 = ?', (UserID))
+            r1 = c1.fetchone()
+
+            if r1(): return jsonify(
+                code='new_messages_available',
+                msg='New messages are available!'
+            ), 200
+            else: return jsonify(
+                code = 'no_new_messages',
+                msg = 'There are no new messages available!'
+            ), 400
+
     @app.route('/messages/read', methods=['GET'])
     def readMessages():
         data = request.get_json()
@@ -535,7 +562,7 @@ class message:
             
             con.execute('DELETE FROM messages WHERE User2 = ?', (UserID))
             os.remove(r1)
-            
+
             try:
                 return send_file(r1)
             except FileNotFoundError:
