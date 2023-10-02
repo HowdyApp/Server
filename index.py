@@ -476,8 +476,7 @@ class message:
     @app.route('/messages/send', methods=['POST'])
     def sendMessages():
         data = request.get_json()
-        toUser = data['Reciever']
-        fromUser = data['Sender']
+        toUser = data['UserID']
         Type = data['Type']
         Content = data['Content']
         Time = datetime.datetime.now()
@@ -492,7 +491,7 @@ class message:
             ), 401
         
         with sqlite3.connect(DATABASE) as con:
-            con.execute('INSERT INTO messages (SenderID, RecieverID, Content, Type, Time) VALUES (?, ?, ?, ?, ?)', (fromUser, toUser, Content, Type, Time))
+            con.execute('INSERT INTO messages (SenderID, RecieverID, Content, Type, Time) VALUES (?, ?, ?, ?, ?)', (UserID, toUser, Content, Type, Time))
         
         return jsonify(
             code='sended',
