@@ -524,7 +524,7 @@ class message:
             ), 401
         
         with sqlite3.connect(DATABASE) as con:
-            c1 = con.execute('SELECT Path FROM messages WHERE User2 = ?', (UserID))
+            c1 = con.execute('SELECT Path FROM messages WHERE User2 = ? AND User1 = ?', (Friend, UserID))
             r1 = c1.fetchone()
 
             if r1(): return jsonify(
