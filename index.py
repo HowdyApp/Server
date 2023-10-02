@@ -563,10 +563,9 @@ class message:
                 return send_file(str(r1[0]))
             except FileNotFoundError:
                 return jsonify(
-                    code='no_new',
+                    code='no_new_filente',
                     msg='There where no new messages.'
                 ), 400
-            
 
 
 if __name__ == '__main__':
