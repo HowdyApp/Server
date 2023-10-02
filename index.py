@@ -532,11 +532,8 @@ class message:
                 msg = 'There are no new messages available!'
             ), 400
 
-    @app.route('/messages/read', methods=['POST'])
-    def readMessages():
-        data = request.get_json()
-        Friend = data['Friend']
-
+    @app.route('/messages/read/<Friend>', methods=['GET'])
+    def readMessages(Friend):
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
