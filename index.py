@@ -521,7 +521,7 @@ class message:
             ), 401
         
         with sqlite3.connect(DATABASE) as con:
-            c1 = con.execute('SELECT * FROM messages WHERE User2 = ? AND User1 = ?', (Friend, UserID))
+            c1 = con.execute('SELECT * FROM messages WHERE User2 = ? AND User1 = ?', (UserID, Friend))
             r1 = c1.fetchone()
             if r1(): return jsonify(
                 code='new_messages_available',
@@ -532,7 +532,7 @@ class message:
                 msg = 'There are no new messages available!'
             ), 400
 
-    @app.route('/messages/read', methods=['GET'])
+    @app.route('/messages/read', methods=['POST'])
     def readMessages():
         data = request.get_json()
         Friend = data['Friend']
