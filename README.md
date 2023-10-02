@@ -23,7 +23,7 @@ To set up and run this backend API for StoryShare, follow these steps:
 5. **Run the Application:**
 
    ```shell
-   docker run -p 55522:5000 --name StoryShare -v /app/storage:/root/StoryShare/Storage/storage -v /app/images:/root/StoryShare/Storage/images storyshare-backend
+   docker run -p 55522:5000 --name StoryShare -v /root/StoryShare/Backend:/app -v /root/StoryShare/Storage/storage:/app/storage -v /root/StoryShare/Storage/images:/app/images storyshare-backend
    ```
 
    The API will start running on `http://localhost:5000`.
