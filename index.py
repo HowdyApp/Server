@@ -478,7 +478,7 @@ class message:
         data = request.get_json()
         log.debug(data)
         toUser = data['UserID']
-        Content = data['Content']
+        Content = (data['Content']).encode()
         Time = datetime.datetime.now()
 
         token = request.headers.get('auth')
