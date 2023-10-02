@@ -521,7 +521,7 @@ class message:
             ), 401
         
         with sqlite3.connect(DATABASE) as con:
-            c1 = con.execute('SELECT * FROM messages WHERE User2 = ? AND User1 = ?', (UserID, Friend))
+            c1 = con.execute('SELECT * FROM messages WHERE User2 = ? AND User1 = ?', (UserID, Friend,))
             r1 = c1.fetchone()
             if r1: return jsonify(
                 code='new_messages_available',
@@ -547,7 +547,7 @@ class message:
             ), 401
         
         with sqlite3.connect(DATABASE) as con:
-            c1 = con.execute('SELECT Path FROM messages WHERE User2 = ?', (UserID))
+            c1 = con.execute('SELECT Path FROM messages WHERE User2 = ?', (UserID,))
             r1 = c1.fetchone()
 
             if r1 == None:
@@ -556,7 +556,7 @@ class message:
                     msg='There where no new messages.'
                 ), 400
             
-            con.execute('DELETE FROM messages WHERE User2 = ?', (UserID))
+            con.execute('DELETE FROM messages WHERE User2 = ?', (UserID,))
             os.remove(r1)
 
             try:
