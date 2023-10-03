@@ -14,6 +14,8 @@ from lib import new
 from lib import log
 from lib import get
 
+from firebase_admin import messaging
+
 import os
 import sqlite3
 import base64
@@ -39,6 +41,10 @@ def download():
 @app.route('/logo')
 def logo():
     return send_file('web/storyshare.png')
+
+@app.route('/terms-of-service')
+def tos():
+    return send_file('app/legal.txt')
 
 @app.route('/release')
 def releases():
