@@ -351,7 +351,7 @@ class friends:
                 con.execute('DELETE FROM requests WHERE RecieveID = ?', (UserID,))
                 con.execute('INSERT INTO friends (User, Friend) VALUES (?, ?)', (UserID, FriendID))
                 c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (UserID,))
-                r1 = c1.fetchone()
+                r1 = (c1.fetchone())[0]
                 new.notification.push('Nieuwe vriend!', f'{r1} heeft je toegevoegd als vriend! (Klik om een bericht te versturen!)', FriendID)
                 return jsonify(
                     code = 'friend_accepted',
