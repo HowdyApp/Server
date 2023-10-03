@@ -8,6 +8,10 @@ from datetime import timedelta
 
 from lib import log
 
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import messaging
+
 import uuid
 import hashlib
 import base64
@@ -50,3 +54,23 @@ class password:
         except Exception as e:
             log.error(e)
             raise (e)
+
+class notification:
+    def push(MSG_title, MSG_content, UserID):
+        cred = credentials.Certificate('storage/storyshare-notifications.json')
+        firebase_admin.initialize_app(cred)
+        with sqlite3.connect(DATABASE) as con:
+            c1 = con.execute('SELECT Token FROM FCMToken WHERE UserID = ?', (UserID,))
+            device_token = c1.fetchone()
+        
+        message = messaging.Message(
+            notification=messaging.Notification(
+                title=MSG_title,
+                body=MSG_content
+            ),
+            token=device_token,
+        )
+        
+        response = messaging.send(message)
+
+        return response;
