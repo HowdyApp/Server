@@ -48,6 +48,28 @@ def releases():
         clientRelease = dotenv.get_key(file, 'vClient')
     ), 200
 
+@app.route('/add/FCMToken', methods=['POST'])
+def FCMToken():
+    token = request.headers.get('auth')
+    UserID = get.token.session(token)
+    data = request.get_json();
+    NotiToken = data['Token']
+
+
+    if(UserID is None): return jsonify(
+            msg = 'Unauthorized!',
+            code = 'unauthorized',
+        ), 401
+    
+    with sqlite3.connect(DATABASE) as con:
+        con.execute('INSERT INTO FCMToken (UserID, Token) VALUES (?, ?)', (UserID, NotiToken))
+    
+    return jsonify(
+        code='Success',
+        msg='Notification token has been added!'
+    ), 200
+
+
 class home:
     @app.route('/home', methods=['GET'])
     def home():
