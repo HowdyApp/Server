@@ -36,6 +36,10 @@ def index():
 def download():
     return send_file('app/storyshare.apk')
 
+@app.route('/logo')
+def logo():
+    return send_file('web/storyshare.png')
+
 @app.route('/release')
 def releases():
     file = r'build'
