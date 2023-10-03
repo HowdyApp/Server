@@ -495,12 +495,12 @@ class friends:
             FRIENDS_INVITED = [row[0] for row in c2.fetchall()]
             FRIENDS_SENDED = [row[0] for row in c3.fetchall()]
             FRIENDS_ALL = FRIENDS_NOW + FRIENDS_INVITED + FRIENDS_SENDED
-            log.debug(FRIENDS_ALL)
 
         return jsonify(
             code='accepted',
             msg='Loaded all friends and friend requests!',
             all=FRIENDS_ALL,
+			now=FRIENDS_NOW
         ), 200  
 
 class message:
