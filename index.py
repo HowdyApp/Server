@@ -14,8 +14,6 @@ from lib import new
 from lib import log
 from lib import get
 
-from firebase_admin import messaging
-
 import os
 import sqlite3
 import base64
@@ -31,20 +29,13 @@ app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
-def index():
-    return send_file('web/main.html')
-
+def index(): return send_file('web/main.html')
 @app.route('/download')
-def download():
-    return send_file('app/storyshare.apk')
-
+def download(): return send_file('app/storyshare.apk')
 @app.route('/logo')
-def logo():
-    return send_file('web/storyshare.png')
-
+def logo(): return send_file('web/storyshare.png')
 @app.route('/terms-of-service')
-def tos():
-    return send_file('app/legal.txt')
+def tos(): return send_file('app/legal.txt')
 
 @app.route('/release')
 def releases():
@@ -73,7 +64,6 @@ def FCMToken():
         code='Success',
         msg='Notification token has been added!'
     ), 200
-
 
 class home:
     @app.route('/home', methods=['GET'])
@@ -360,11 +350,18 @@ class friends:
             if (r1 == True):
                 con.execute('DELETE FROM requests WHERE RecieveID = ?', (UserID,))
                 con.execute('INSERT INTO friends (User, Friend) VALUES (?, ?)', (UserID, FriendID))
-
-        return jsonify(
-            code = 'friend_accepted',
-            msg = f'Friend is accepted!'
-        ), 202
+                c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (UserID,))
+                r1 = c1.fetchone()
+                new.notification.push('Nieuwe vriend!', f'{r1} heeft je toegevoegd als vriend! (Klik om een bericht te versturen!)', FriendID)
+                return jsonify(
+                    code = 'friend_accepted',
+                    msg = f'Friend is accepted!'
+                ), 202
+            else:
+                return jsonify(
+                    code='friend_not_worked',
+                    msg='Something went wrong!'
+                )
 
     @app.route('/friends/reject', methods=['POST'])
     def reject():
@@ -533,6 +530,9 @@ class message:
 
         with sqlite3.connect(DATABASE) as con:
             con.execute('INSERT INTO messages (User1, User2, Path, Time, Status) VALUES (?, ?, ?, ?, "Sent")', (UserID, toUser, path, Time,))
+            c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (toUser,))
+            r1 = c1.fetchone()
+            new.notification.push('Nieuw bericht!', f'{r1} heeft je een nieuw bericht gestuurd. Klik om te bekijken!', toUser)
         
         return jsonify(
             code='sent',
