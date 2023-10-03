@@ -530,8 +530,8 @@ class message:
 
         with sqlite3.connect(DATABASE) as con:
             con.execute('INSERT INTO messages (User1, User2, Path, Time, Status) VALUES (?, ?, ?, ?, "Sent")', (UserID, toUser, path, Time,))
-            c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (toUser,))
-            r1 = c1.fetchone()
+            c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (UserID,))
+            r1 = (c1.fetchone())[0]
             new.notification.push('Nieuw bericht!', f'{r1} heeft je een nieuw bericht gestuurd. Klik om te bekijken!', toUser)
         
         return jsonify(
