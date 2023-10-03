@@ -55,14 +55,13 @@ def FCMToken():
     data = request.get_json();
     NotiToken = data['Token']
 
-
     if(UserID is None): return jsonify(
             msg = 'Unauthorized!',
             code = 'unauthorized',
         ), 401
     
     with sqlite3.connect(DATABASE) as con:
-        con.execute('INSERT INTO FCMToken (UserID, Token) VALUES (?, ?)', (UserID, NotiToken))
+        con.execute('INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (?, ?)', (UserID, NotiToken))
     
     return jsonify(
         code='Success',
