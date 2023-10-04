@@ -97,7 +97,7 @@ class home:
             images=pairs
         ), 200
 
-    @app.route('/home/<friend>/<image>')
+    @app.route('/home/<friend>/<image>', methods=['GET'])
     def image(friend, image):
         log.success('Loaded an new image!')
         token = request.headers.get('auth')
@@ -120,6 +120,21 @@ class home:
         except FileNotFoundError:
             return jsonify(code='dne', msg='Bestaat niet!')
 
+    @app.route('/home/<friend>/<image>/info', methods=['GET'])
+    def image(friend, image):
+        log.success('Loaded an new image!')
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+
+        if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
+
+        with sqlite3.connect(DATABASE) as con:
+            c1 = con.execute('SELECT time, likes FROM images WHERE `ImageID` = ? AND UserID = ?', (image, friend,))
+            r1 = c1.fetchone()
+            return jsonify(
+                time=r1[0],
+                likes=r1[1],
+            ), 200
 
 class account:
     @app.route('/account/register', methods=['POST'])
@@ -274,6 +289,7 @@ class camera:
         image = data['img'].encode()
         token = request.headers.get('auth')
         UserID = get.token.session(token)
+        time = datetime.datetime.now()
 
         if(UserID is None): return jsonify(
                 msg = 'Unauthorized!',
@@ -285,7 +301,7 @@ class camera:
         path = f'./images/{UserID}/{ImageID}.jpg'
 
         with sqlite3.connect(DATABASE) as con:
-            con.execute('INSERT INTO images (UserID, imageID, path) VALUES (?, ?, ?)', (UserID, ImageID, path))
+            con.execute('INSERT INTO images (UserID, imageID, path, time, likes) VALUES (?, ?, ?, ?, 0)', (UserID, ImageID, path, time,))
 
         directory = os.path.dirname(path)
         if not os.path.exists(directory):
