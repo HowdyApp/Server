@@ -2,11 +2,13 @@ from lib import log
 import sqlite3
 from datetime import datetime
 import bcrypt
+from lib import log
 
 DATABASE = './storage/db.sqlite'
 
 class token:
     def session(key):
+        log.info('Loaded a new session key.')
         try:
             with sqlite3.connect(DATABASE) as con:
                 c1 = con.execute('SELECT UserID, Expiration FROM tokens WHERE Token = ? LIMIT 1', (key,))
@@ -25,6 +27,7 @@ class token:
 
 class password:
     def check(password, database):
+        log.info('Checked a new password!')
         try:
             if not isinstance(password, (str, bytes)):
                 raise ValueError("The password must be a string or bytes")

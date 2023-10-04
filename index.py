@@ -47,6 +47,7 @@ def releases():
 
 @app.route('/add/FCMToken', methods=['POST'])
 def FCMToken():
+    log.success('Added a new notification token.')
     token = request.headers.get('auth')
     UserID = get.token.session(token)
     data = request.get_json();
@@ -68,6 +69,7 @@ def FCMToken():
 class home:
     @app.route('/home', methods=['GET'])
     def home():
+        log.success('Loaded all home-users!')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -97,6 +99,7 @@ class home:
 
     @app.route('/home/<friend>/<image>')
     def image(friend, image):
+        log.success('Loaded an new image!')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -121,6 +124,7 @@ class home:
 class account:
     @app.route('/account/register', methods=['POST'])
     def register():
+        log.success('New registration!')
         data = request.get_json()
 
         username = data['user']
@@ -155,6 +159,7 @@ class account:
 
     @app.route('/account/login', methods=['POST'])
     def login():
+        log.success('Login successful')
         try:
             data = request.get_json()
             mail = data['mail']
@@ -196,6 +201,7 @@ class account:
     
     @app.route('/account/me', methods=['POST'])
     def me():
+        log.success('Account info')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -216,6 +222,7 @@ class account:
 
     @app.route('/account/delete', methods=['POST'])
     def delete():
+        log.success('Deleted account')
         try:
             data = request.get_json()
             pasw = str(data['pasw']).encode('utf-8')
@@ -262,6 +269,7 @@ class account:
 class camera:
     @app.route('/cam/new', methods=['POST'])
     def new():
+        log.success('New upload to story.')
         data = request.get_json()
         image = data['img'].encode()
         token = request.headers.get('auth')
@@ -294,6 +302,7 @@ class camera:
 class friends:
     @app.route('/friends/add', methods=['POST'])
     def add():
+        log.success('Sended a new friend request.')
         data = request.get_json()
         Friend = data['friend']
         token = request.headers.get('auth')
@@ -334,6 +343,7 @@ class friends:
 
     @app.route('/friends/accept', methods=['POST'])
     def accept():
+        log.success('Accepted a friend')
         data = request.get_json()
         FriendID = data['friend']
         token = request.headers.get('auth')
@@ -365,6 +375,7 @@ class friends:
 
     @app.route('/friends/reject', methods=['POST'])
     def reject():
+        log.success('Rejected a friend.')
         data = request.get_json()
         FriendID = data['friend']
         token = request.headers.get('auth')
@@ -388,6 +399,7 @@ class friends:
 
     @app.route('/friends/remove', methods=['POST'])
     def remove():
+        log.success('Removed a friend.')
         data = request.get_json()
         Friend = data['friend']
         token = request.headers.get('auth')
@@ -413,6 +425,7 @@ class friends:
     
     @app.route('/friends/cancel', methods=['POST'])
     def cancelRequest():
+        log.success('Canceled a request.')
         data = request.get_json()
         Friend = data['friend']
         token = request.headers.get('auth')
@@ -440,6 +453,7 @@ class friends:
 
     @app.route('/friends/info', methods=['POST'])
     def getinfo():
+        log.success('Loaded status of friend.')
         data = request.get_json()
         FriendID = data['FriendID']
         token = request.headers.get('auth')
@@ -474,6 +488,7 @@ class friends:
 
     @app.route('/friends/list', methods=['GET'])
     def list_friends():
+        log.success('Listed all the friends.')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -503,6 +518,7 @@ class friends:
 class message:
     @app.route('/messages/send', methods=['POST'])
     def sendMessages():
+        log.success('Sent a message.')
         data = request.get_json()
         toUser = data['UserID']
         Content = (data['Content']).encode()
@@ -542,6 +558,7 @@ class message:
     
     @app.route('/messages/query/<Friend>', methods=['GET'])
     def queryMessage(Friend):
+        log.success('Quered a message status.')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -565,6 +582,7 @@ class message:
 
     @app.route('/messages/read/<Friend>', methods=['GET'])
     def readMessages(Friend):
+        log.success('Read a message')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
