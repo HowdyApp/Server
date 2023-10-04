@@ -4,6 +4,8 @@
 # ---
 
 from flask import Flask
+from flask import redirect
+from flask import url_for
 from flask import request
 from flask import jsonify
 from flask import send_file
@@ -73,11 +75,14 @@ class home:
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
-        if(UserID is None): return jsonify(
-                msg = 'Unauthorized!',
-                code = 'unauthorized',
+        if UserID is None:
+            return jsonify(
+                msg='Unauthorized!',
+                code='unauthorized',
             ), 401
-        
+
+        page = int(request.args.get('page', 1))
+
         with sqlite3.connect(DATABASE) as con:
             c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
             c2 = con.execute('SELECT User FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
@@ -86,16 +91,26 @@ class home:
             pairs = []
 
             for friend in friends:
-                c3 = con.execute('SELECT ImageID FROM images WHERE UserID = ?', (friend,))
+                c3 = con.execute('SELECT ImageID FROM images WHERE UserID = ? ORDER BY time', (friend,))
                 r3 = c3.fetchall()
                 for image_row in r3:
                     pairs.append(f"{friend}/{image_row[0]}")
-    
+
+        start_index = (page - 1) * 15
+        end_index = start_index + 15
+
+        next_images = pairs[start_index:end_index]
+
         return jsonify(
-            code = 'success',
-            msg = 'Loaded all friends!',
-            images=pairs
+            code='success',
+            msg='Loaded all friends!',
+            images=next_images
         ), 200
+
+    @app.route('/home/<int:page>', methods=['GET'])
+    def home_page(page):
+        return redirect(url_for('home', page=page))
+
 
     @app.route('/home/<friend>/<image>', methods=['GET'])
     def image(friend, image):
