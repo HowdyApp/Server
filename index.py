@@ -151,6 +151,25 @@ class home:
                 time=r1[0],
                 likes=r1[1],
             ), 200
+        
+    @app.route('/home/<friend>/<image>/like', methods=['POST'])
+    def like(friend, image):
+        log.success('Liked image!')
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+
+        if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
+
+        with sqlite3.connect(DATABASE) as con:
+            c1 = con.execute('SELECT likes FROM images WHERE UserID = ? AND imageID = ?', (friend, image))
+            r1 = c1.fetchone()
+            likes = int(r1[0]) + 1
+            c2 = con.execute('UPDATE images SET likes = ? WHERE UserID = ? AND imageID = ?'), (likes, friend, image)
+        
+        return jsonify(
+            code = 'Success!',
+            msg = 'Like count has been updated!'
+        ), 200
 
 class account:
     @app.route('/account/register', methods=['POST'])
