@@ -24,6 +24,7 @@ import json
 import shutil
 import dotenv
 import datetime
+import re
 
 DATABASE = './storage/db.sqlite'
 
@@ -160,6 +161,12 @@ class account:
         username = data['user']
         mailadrs = data['mail']
         password = new.password.encrypt(data['pasw'])
+
+        if not re.match(r'^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$', mailadrs):
+            return jsonify(
+                code='regex_error',
+                msg='Please enter a valid mail.'
+            ), 200
 
         UserID = new.token.user(username, mailadrs)
         with sqlite3.connect(DATABASE) as con:
