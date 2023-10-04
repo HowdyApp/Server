@@ -20,6 +20,9 @@ import sqlite3
 
 DATABASE = './storage/db.sqlite'
 
+cred = credentials.Certificate('storage/storyshare-notifications.json')
+firebase_admin.initialize_app(cred)
+
 class token:
     def session(UserID):
         try:
@@ -57,8 +60,6 @@ class password:
 
 class notification:
     def push(MSG_title, MSG_content, UserID):
-        cred = credentials.Certificate('storage/storyshare-notifications.json')
-        firebase_admin.initialize_app(cred)
         with sqlite3.connect(DATABASE) as con:
             c1 = con.execute('SELECT Token FROM FCMToken WHERE UserID = ?', (UserID,))
             device_token = (c1.fetchone())[0]
