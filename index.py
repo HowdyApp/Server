@@ -137,7 +137,7 @@ class home:
             return jsonify(code='dne', msg='Bestaat niet!')
 
     @app.route('/home/<friend>/<image>/info', methods=['GET'])
-    def image(friend, image):
+    def imageInfo(friend, image):
         log.success('Loaded an new image!')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
