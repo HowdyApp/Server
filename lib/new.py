@@ -26,7 +26,6 @@ firebase_admin.initialize_app(cred)
 class token:
     def session(UserID):
         try:
-            log.info('New session token created!')
             key = uuid.uuid4()
             key = base64.b64encode(str(key).encode()).decode()
             date = datetime.now() + timedelta(days=7)
@@ -40,7 +39,6 @@ class token:
     
     def user(username, email):
         try:
-            log.info('New encryption')
             key = username + email
             key = hashlib.sha256(key.encode()).hexdigest()
             key = key + str(uuid.uuid4())
@@ -53,7 +51,6 @@ class token:
 class password:
     def encrypt(password):
         try:
-            log.info('Encrypted a new password.')
             salt = bcrypt.gensalt()
             hashed = bcrypt.hashpw(password, salt)
             return hashed
@@ -63,7 +60,6 @@ class password:
 
 class notification:
     def push(MSG_title, MSG_content, UserID):
-        log.info('New push notification sended!')
         with sqlite3.connect(DATABASE) as con:
             c1 = con.execute('SELECT Token FROM FCMToken WHERE UserID = ?', (UserID,))
             device_token = (c1.fetchone())[0]
