@@ -31,48 +31,28 @@ DATABASE = './storage/db.sqlite'
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/')
-def index(): return send_file('web/main.html')
-@app.route('/download')
-def download(): return send_file('app/howdy.apk')
-@app.route('/logo')
-def logo(): return send_file('web/howdy.png')
-@app.route('/terms-of-service')
-def tos(): return send_file('app/legal.txt')
+@app.before_request
+def beforeRequest():
+    log.session(f'Requesting to: {app.route}')
 
-@app.route('/release')
-def releases():
-    file = r'build'
-    return jsonify(
-        serverRelease = dotenv.get_key(file, 'vServer'),
-        clientRelease = dotenv.get_key(file, 'vClient')
-    ), 200
+@app.after_request
+def afterRequest():
+    log.success(f'Requested to {app.route} and returned!')
 
-@app.route('/add/FCMToken', methods=['POST'])
-def FCMToken():
-    log.success('Added a new notification token.')
-    token = request.headers.get('auth')
-    UserID = get.token.session(token)
-    data = request.get_json();
-    NotiToken = data['Token']
+class web:
+    @app.route('/')
+    def index(): return send_file('web/main.html')
+    @app.route('/download')
+    def download(): return send_file('app/howdy.apk')
+    @app.route('/logo')
+    def logo(): return send_file('web/howdy.png')
+    @app.route('/terms-of-service')
+    def tos(): return send_file('app/legal.txt')
 
-    if(UserID is None): return jsonify(
-            msg = 'Unauthorized!',
-            code = 'unauthorized',
-        ), 401
-    
-    with sqlite3.connect(DATABASE) as con:
-        con.execute('INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (?, ?)', (UserID, NotiToken))
-    
-    return jsonify(
-        code='Success',
-        msg='Notification token has been added!'
-    ), 200
 
 class home:
     @app.route('/home', methods=['GET'])
     def home():
-        log.success('Loaded all home-users!')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -83,6 +63,7 @@ class home:
             ), 401
 
         page = int(request.args.get('page', 1))
+        log.trace(f'Loading page "{page}".')
 
         with sqlite3.connect(DATABASE) as con:
             c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
@@ -134,7 +115,7 @@ class home:
         try:
             return send_from_directory(pathdir, pathimg)
         except FileNotFoundError:
-            return jsonify(code='dne', msg='Bestaat niet!')
+            return jsonify(code='cftf', msg='Bestaat niet!')
 
     @app.route('/home/<friend>/<image>/info', methods=['GET'])
     def imageInfo(friend, image):
@@ -147,10 +128,13 @@ class home:
         with sqlite3.connect(DATABASE) as con:
             c1 = con.execute('SELECT time, likes FROM images WHERE `ImageID` = ? AND UserID = ?', (image, friend,))
             r1 = c1.fetchone()
-            return jsonify(
-                time=r1[0],
-                likes=r1[1],
-            ), 200
+        
+        return jsonify(
+            code='Success',
+            msg='The data-fetch was successful!',
+            time=r1[0],
+            likes=r1[1],
+        ), 200
         
     @app.route('/home/<friend>/<image>/like', methods=['POST'])
     def like(friend, image):
@@ -670,6 +654,28 @@ class message:
                 ), 400
             finally:
                 os.remove(str(r1[0]))
+
+class settings:
+    @app.route('/add/FCMToken', methods=['POST'])
+    def FCMToken():
+        log.success('Added a new notification token.')
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+        data = request.get_json();
+        NotiToken = data['Token']
+
+        if(UserID is None): return jsonify(
+                msg = 'Unauthorized!',
+                code = 'unauthorized',
+            ), 401
+        
+        with sqlite3.connect(DATABASE) as con:
+            con.execute('INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (?, ?)', (UserID, NotiToken))
+        
+        return jsonify(
+            code='Success',
+            msg='Notification token has been added!'
+        ), 200
 
 if __name__ == '__main__':
     app.run()
