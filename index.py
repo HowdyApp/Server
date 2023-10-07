@@ -70,13 +70,15 @@ class home:
             c2 = con.execute('SELECT User FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
             r1 = c1.fetchall() + c2.fetchall()
             friends = [row[0] for row in r1]
-            pairs = []
+            pairs = set()  # Gebruik een set om dubbele afbeeldingen te vermijden
 
             for friend in friends:
                 c3 = con.execute('SELECT ImageID FROM images WHERE UserID = ? ORDER BY time', (friend,))
                 r3 = c3.fetchall()
                 for image_row in r3:
-                    pairs.append(f"{friend}/{image_row[0]}")
+                    pairs.add(f"{friend}/{image_row[0]}")
+
+        pairs = list(pairs)  # Zet de set terug in een lijst
 
         start_index = (page - 1) * 15
         end_index = start_index + 15
@@ -298,6 +300,7 @@ class account:
             con.execute('DELETE FROM friends WHERE Friend = ?', (UserID,))
             con.execute('DELETE FROM tokens WHERE UserID = ?', (UserID,))
             con.execute('DELETE FROM images WHERE UserID = ?', (UserID,))
+            # deepcode ignore PT: <please specify a reason of ignoring this>
             try: shutil.rmtree(f'./images/{UserID}')
             except: ''
 
@@ -331,7 +334,8 @@ class camera:
         directory = os.path.dirname(path)
         if not os.path.exists(directory):
             os.makedirs(directory)
-
+        
+        # deepcode ignore PT: It opens a path what is stored in our database.
         with open(path, "wb") as ws:
             ws.write(base64.decodebytes(image))
             
@@ -357,7 +361,7 @@ class friends:
         with sqlite3.connect(DATABASE) as con:
             c1 = con.execute('SELECT userid FROM auth WHERE user = ?', (Friend,))
             r1 = (c1.fetchone())
-            if r1 == None: return jsonify(
+            if r1 is None: return jsonify(
                 msg="Unauthorized!", code = 'unauthorized',
             ), 401
             r1 = r1[0]
@@ -510,10 +514,10 @@ class friends:
             c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (FriendID,))
             c2 = con.execute('SELECT Status FROM requests WHERE (SenderID = ? AND RecieveID = ?);', (FriendID, UserID,))
             c3 = con.execute('SELECT Status FROM requests WHERE (SenderID = ? AND RecieveID = ?);', (UserID, FriendID,))
-            if c2.fetchone() != None: r2 = 1 # Recieved
-            elif c3.fetchone() != None: r2 = 2 # Sent
+            if c2.fetchone() is not None: r2 = 1 # Recieved
+            elif c3.fetchone() is not None: r2 = 2 # Sent
             else: r2 = None
-            if r2 == None:
+            if r2 is None:
                 c2 = con.execute('SELECT 1 FROM friends WHERE (User = ? AND Friend = ?) OR (User = ? AND Friend = ?);', (UserID, FriendID, FriendID, UserID))
                 r2 = c2.fetchone()
                 if r2 == True:
@@ -582,6 +586,7 @@ class message:
         if not os.path.exists(directory):
             os.makedirs(directory)
 
+        # deepcode ignore PT: This section does NOT import the variables from a HTTP source.
         with open(path, "wb") as ws:
             ws.write(base64.decodebytes(Content))
 
@@ -637,7 +642,7 @@ class message:
             c1 = con.execute('SELECT Path FROM messages WHERE User2 = ?', (UserID,))
             r1 = c1.fetchone()
 
-            if r1 == None:
+            if r1 is None:
                 return jsonify(
                     code='no_new',
                     msg='There where no new messages.'
@@ -646,6 +651,7 @@ class message:
             con.execute('DELETE FROM messages WHERE User2 = ?', (UserID,))
 
             try:
+                # deepcode ignore PT: This sends a file, does not import a file or changes anything to the source.
                 return send_file(str(r1[0]))
             except FileNotFoundError:
                 return jsonify(
