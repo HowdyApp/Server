@@ -190,7 +190,7 @@ class account:
                 msg='There was an unexpected error!',
                 code='error'
             ), 500
-        global con;
+            
         with con.cursor as con:
             con.execute('DELETE FROM auth WHERE userid = ?', (UserID,))
             con.execute('DELETE FROM friends WHERE User = ?', (UserID,))
