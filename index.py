@@ -33,11 +33,11 @@ CORS(app)
 
 @app.before_request
 def beforeRequest():
-    log.session(f'Requesting to: {app.route}')
+    log.session(f'Requesting to: {request.endpoint}')
 
 @app.after_request
 def afterRequest():
-    log.success(f'Requested to {app.route} and returned!')
+    log.success(f'Requested to {request.endpoint} and returned!')
 
 class web:
     @app.route('/')
