@@ -585,29 +585,24 @@ class friends:
         global con;
         with con.cursor() as cur:
             cur.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
-            r1 = cur.fetchone()
+            r1 = cur.fetchall()
             cur.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
-            r2 = cur.fetchone()
+            r2 = cur.fetchall()
             cur.execute('SELECT Sender FROM requests WHERE Recipient = %s', (UserID,))
-            r3 = cur.fetchone()
+            r3 = cur.fetchall()
             cur.execute('SELECT Recipient FROM requests WHERE Sender = %s', (UserID,))
-            r4 = cur.fetchone()
+            r4 = cur.fetchall()
             FRIENDS_NOW = [row[0] for row in r1] + [row[0] for row in r2]
             FRIENDS_INVITED = [row[0] for row in r3]
             FRIENDS_SENDED = [row[0] for row in r4]
             FRIENDS_ALL = FRIENDS_NOW + FRIENDS_INVITED + FRIENDS_SENDED
-
-            log.debug(FRIENDS_NOW)
-            log.debug(FRIENDS_INVITED)
-            log.debug(FRIENDS_SENDED)
-            log.debug(FRIENDS_ALL)
 
         return jsonify(
             code='accepted',
             msg='Loaded all friends and friend requests!',
             all=FRIENDS_ALL,
 			now=FRIENDS_NOW
-        ), 200  
+        ), 200
 
 class message:
     @app.route('/messages/send', methods=['POST'])
