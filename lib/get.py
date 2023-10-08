@@ -18,7 +18,7 @@ con = psycopg2.connect(
     port=DBHOSTPORT
 )
 
-class Token:
+class token:
     @staticmethod
     def session(key):
         try:
@@ -34,7 +34,7 @@ class Token:
             log.error(e)
             raise e
 
-class Password:
+class password:
     @staticmethod
     def check(password, database):
         try:
