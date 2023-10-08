@@ -39,8 +39,6 @@ con = psycopg2.connect(
     port=DBHOSTPORT
 );
 
-con.autocommit(True);
-
 app = Flask(__name__)
 CORS(app)
 

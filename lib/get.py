@@ -18,8 +18,6 @@ con = psycopg2.connect(
     port=DBHOSTPORT
 );
 
-con.autocommit(True);
-
 class token:
     @staticmethod
     def session(key):
