@@ -310,8 +310,8 @@ class friends:
             r1 = cur.fetchone()[0]
             if (r1 == True):
                 cur.execute('''
-                            DELETE FROM requests WHERE Reciepent = %s
-                            INSERT INTO friends (User01, User02) VALUES (%s, %s)
+                            DELETE FROM requests WHERE Reciepent = %s;
+                            INSERT INTO friends (User01, User02) VALUES (%s, %s);
                             ''', (UserID, UserID, FriendID,))
                 con.commit()
                 cur.execute('''SELECT username FROM auth WHERE userid = %s''', (UserID,))
