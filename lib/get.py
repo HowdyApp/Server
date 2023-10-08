@@ -26,6 +26,7 @@ class token:
             with con.cursor() as cur:
                 cur.execute('''SELECT UserID, Expiration FROM tokens WHERE Token = %s LIMIT 1''', (key,))
                 r1 = cur.fetchone()
+                log.debug(r1)
                 if r1:
                     return r1[0]
                 else:
