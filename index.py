@@ -636,9 +636,9 @@ class message:
         # deepcode ignore PT: This section does NOT import the variables from a HTTP source.
         with open(path, "wb") as ws:
             ws.write(base64.decodebytes(Content))
-        global con;
+
         with con.cursor() as cur:
-            cur.execute('''INSERT INTO messages (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, "Sent")''', (UserID, toUser, path, Time,))
+            cur.execute('''INSERT INTO messages (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, 'Sent')''', (UserID, toUser, path, Time,))
             con.commit()
             cur.execute('''SELECT user FROM auth WHERE userid = %s''', (UserID,))
             r1 = cur.fetchone()
