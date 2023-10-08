@@ -597,6 +597,11 @@ class friends:
             FRIENDS_SENDED = [row[0] for row in r4]
             FRIENDS_ALL = FRIENDS_NOW + FRIENDS_INVITED + FRIENDS_SENDED
 
+            log.debug(FRIENDS_NOW)
+            log.debug(FRIENDS_INVITED)
+            log.debug(FRIENDS_SENDED)
+            log.debug(FRIENDS_ALL)
+
         return jsonify(
             code='accepted',
             msg='Loaded all friends and friend requests!',
