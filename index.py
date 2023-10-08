@@ -73,7 +73,7 @@ class account:
             ), 200
 
         UserID = new.token.user(username, mailadrs)
-        with con.cursor as cur:
+        with con.cursor() as cur:
             try:
                 cur.execute('''
                             INSERT INTO "public"."auth" ("username", "mail", "pass", "profilepicture", "userid")
@@ -107,7 +107,7 @@ class account:
             data = request.get_json()
             mail = data['mail']
             pasw = data['pasw']
-            with con.cursor as cur:
+            with con.cursor() as cur:
                 cur.execute('''SELECT userid FROM auth WHERE mail = %s''', (mail,))
                 r1 = cur.fetchone()
                 if r1 is not None:
@@ -151,7 +151,7 @@ class account:
                 code = 'unauthorized',
             ), 401
 
-        with con.cursor as cur:
+        with con.cursor() as cur:
                 cur.execute('''SELECT user FROM auth WHERE userid = %s''', (UserID,))
                 r1 = (cur.fetchone())[0]
         
@@ -175,7 +175,7 @@ class account:
                     code = 'unauthorized',
                 ), 401
             
-            with con.cursor as cur:
+            with con.cursor() as cur:
                 cur.execute('''SELECT pass FROM auth WHERE userid = %s''', (UserID,))
                 r1 = (cur.fetchone())[0]
                 r2 = get.password.check(pasw, r1)
@@ -190,7 +190,7 @@ class account:
                 code='error'
             ), 500
             
-        with con.cursor as cur:
+        with con.cursor() as cur:
             cur.execute('''
                         DELETE FROM auth WHERE userid = %s
                         DELETE FROM friends WHERE User = %s
@@ -225,7 +225,7 @@ class account:
                 msg = 'Unauthorized!',
                 code = 'unauthorized',
             ), 401
-        with con.cursor as cur:
+        with con.cursor() as cur:
             cur.execute('''UPDATE auth SET profile = %s WHERE userid = %s''', (url, UserID))
             con.commit()        
         return jsonify(
@@ -383,7 +383,7 @@ class friends:
                 msg = 'Unauthorized!',
                 code = 'unauthorized',
             ), 401
-        with con.cursor as cur:
+        with con.cursor() as cur:
             cur.execute('''SELECT userid FROM auth WHERE username = %s''')
             r1 = (cur.fetchone())
             if r1 is None: return jsonify(
@@ -423,7 +423,7 @@ class friends:
             msg = 'Unauthorized!',
             code = 'unauthorized',
         ), 401
-        with con.cursor as cur:
+        with con.cursor() as cur:
             cur.execute('''SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = %s)''', (FriendID,))
             r1 = cur.fetchone()[0]
             if (r1 == True):
@@ -456,7 +456,7 @@ class friends:
             msg = 'Unauthorized!',
             code = 'unauthorized',
         ), 401
-        with con.cursor as cur:
+        with con.cursor() as cur:
             cur.execute('''SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = %s)''', (FriendID,))
             r1 = cur.fetchone()[0]
             if (r1 == True):
@@ -480,7 +480,7 @@ class friends:
             code = 'unauthorized',
         ), 401
         global con;
-        with con.cursor as cur:
+        with con.cursor() as cur:
             try:
                 cur.execute('''
                             DELETE FROM friends WHERE User02 = %s AND User01 = %s
@@ -511,7 +511,7 @@ class friends:
             code = 'unauthorized',
         ), 401
         global con;
-        with con.cursor as cur:
+        with con.cursor() as cur:
             try:
                 cur.execute('''DELETE FROM requests WHERE SenderID = %s AND RecieveID = %s''', (UserID, Friend,))
                 con.commit()
@@ -541,7 +541,7 @@ class friends:
                 code='unauthorized',
             ), 401
 
-        with con.cursor as cur:
+        with con.cursor() as cur:
 
             cur.execute('''SELECT user FROM auth WHERE userid = %s''', (FriendID,))
             r1 = cur.fetchone()[0]
@@ -583,7 +583,7 @@ class friends:
             ), 401
         
         global con;
-        with con.cursor as cur:
+        with con.cursor() as cur:
             cur.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
             r1 = cur.fetchone()
             cur.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
@@ -638,7 +638,7 @@ class message:
         with open(path, "wb") as ws:
             ws.write(base64.decodebytes(Content))
         global con;
-        with con.cursor as cur:
+        with con.cursor() as cur:
             cur.execute('''INSERT INTO messages (User1, User2, Path, Time, Status) VALUES (%s, %s, %s, %s, "Sent")''', (UserID, toUser, path, Time,))
             con.commit()
             cur.execute('''SELECT user FROM auth WHERE userid = %s''', (UserID,))
@@ -661,7 +661,7 @@ class message:
                 msg='Unauthorized!',
                 code='unauthorized',
             ), 401
-        with con.cursor as cur:
+        with con.cursor() as cur:
             cur.execute('''SELECT * FROM messages WHERE User2 = %s AND User1 = %s''', (UserID, Friend,))
             r1 = cur.fetchone()
             if r1: return jsonify(
@@ -684,7 +684,7 @@ class message:
                 code='unauthorized',
             ), 401
         global con;
-        with con.cursor as cur:
+        with con.cursor() as cur:
             cur.execute('''SELECT Path FROM messages WHERE User2 = %s''', (UserID,))
             r1 = cur.fetchone()
 
@@ -721,7 +721,7 @@ class settings:
                 code = 'unauthorized',
             ), 401
         global con;
-        with con.cursor as con:
+        with con.cursor() as con:
             con.execute('''INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (%s, %s)''', (UserID, NotiToken))
         
         return jsonify(
@@ -741,7 +741,7 @@ class settings:
                 code = 'unauthorized',
             ), 401
         if(GetID == 'Self'):
-            with con.cursor as cur:
+            with con.cursor() as cur:
                 cur.execute('''SELECT profile FROM auth WHERE userid = %s''', (UserID,))
                 r1 = cur.fetchone()
             return jsonify(
@@ -749,7 +749,7 @@ class settings:
                 url=r1[0],
             ), 200
         else:
-            with con.cursor as cur:
+            with con.cursor() as cur:
                 cur.execute('''SELECT profile FROM auth WHERE userid = %s''', (GetID,))
                 r1 = cur.fetchone()
             return jsonify(
