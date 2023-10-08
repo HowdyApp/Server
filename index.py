@@ -36,12 +36,11 @@ DATABASE = f'dbname=main user={DBUSERNAME} password={DBPASSWORD} host={DBHOSTNAM
 
 app = Flask(__name__)
 CORS(app)
+global con
 con = psycopg2.connect(DATABASE)
 
 @app.before_request
 def beforeRequest():
-    global con
-    con = psycopg2.connect(DATABASE)
     log.session(f'Endpoint request --> {request.endpoint}')
 
 class web:
