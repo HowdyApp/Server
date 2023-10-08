@@ -702,19 +702,17 @@ class settings:
             with sqlite3.connect(DATABASE) as con:
                 c1 = con.execute('SELECT profile FROM auth WHERE userid = ?', (UserID,))
                 r1 = c1.fetchone()
-                log.debug(f'Self Containing: {r1}')
             return jsonify(
                 code='Success',
-                url=r1,
+                url=r1[0],
             ), 200
         else:
             with sqlite3.connect(DATABASE) as con:
                 c1 = con.execute('SELECT profile FROM auth WHERE userid = ?', (GetID,))
                 r1 = c1.fetchone()
-                log.debug(f'Custom: {r1}')
             return jsonify(
                 code='Success',
-                url=r1,
+                url=r1[0],
             ), 200
 
 
