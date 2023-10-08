@@ -192,8 +192,8 @@ class account:
 
         with con.cursor() as con:
             con.execute('DELETE FROM auth WHERE userid = %s', (UserID,))
-            con.execute('DELETE FROM friends WHERE User = %s', (UserID,))
-            con.execute('DELETE FROM friends WHERE Friend = %s', (UserID,))
+            con.execute('DELETE FROM friends WHERE User01 = %s', (UserID,))
+            con.execute('DELETE FROM friends WHERE User02 = %s', (UserID,))
             con.execute('DELETE FROM tokens WHERE UserID = %s', (UserID,))
             con.execute('DELETE FROM images WHERE UserID = %s', (UserID,))
             # deepcode ignore PT: <please specify a reason of ignoring this>
@@ -251,8 +251,8 @@ class story:
         log.trace(f'Loading page "{page}".')
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT Friend FROM friends WHERE User = %s OR Friend = %s', (UserID, UserID,))
-            c2 = con.execute('SELECT User FROM friends WHERE User = %s OR Friend = %s', (UserID, UserID,))
+            c1 = con.execute('SELECT User02 FROM friends WHERE User01 = %s OR User02 = %s', (UserID, UserID,))
+            c2 = con.execute('SELECT User01 FROM friends WHERE User01 = %s OR User02 = %s', (UserID, UserID,))
             r1 = c1.fetchall() + c2.fetchall()
             friends = [row[0] for row in r1]
             pairs = set()  # Gebruik een set om dubbele afbeeldingen te vermijden
@@ -290,7 +290,7 @@ class story:
         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT Friend FROM friends WHERE User = %s OR Friend = %s', (UserID, UserID,))
+            c1 = con.execute('SELECT User02 FROM friends WHERE User01 = %s OR User02 = %s', (UserID, UserID,))
             r1 = c1.fetchone()
             if (r1): r1 = True
             else: r1 = False
@@ -488,11 +488,11 @@ class friends:
 
         with con.cursor() as con:
             try:
-                con.execute('DELETE FROM friends WHERE Friend = %s AND User = %s', (UserID, Friend,))
-                con.execute('DELETE FROM friends WHERE User = %s AND Friend = %s', (UserID, Friend,))
+                con.execute('DELETE FROM friends WHERE User02 = %s AND User01 = %s', (UserID, Friend,))
+                con.execute('DELETE FROM friends WHERE User01 = %s AND User02 = %s', (UserID, Friend,))
             except:
-                con.execute('DELETE FROM friends WHERE User = %s AND Friend = %s', (UserID, Friend,))
-                con.execute('DELETE FROM friends WHERE Friend = %s AND User = %s', (UserID, Friend,))   
+                con.execute('DELETE FROM friends WHERE User01 = %s AND User02 = %s', (UserID, Friend,))
+                con.execute('DELETE FROM friends WHERE User02 = %s AND User01 = %s', (UserID, Friend,))   
         
         return jsonify(
             code = 'friend_deleted',
@@ -550,7 +550,7 @@ class friends:
             elif c3.fetchone() is not None: r2 = 2 # Sent
             else: r2 = None
             if r2 is None:
-                c2 = con.execute('SELECT 1 FROM friends WHERE (User = %s AND Friend = %s) OR (User = %s AND Friend = %s);', (UserID, FriendID, FriendID, UserID))
+                c2 = con.execute('SELECT 1 FROM friends WHERE (User01 = %s AND User02 = %s) OR (User01 = %s AND User02 = %s);', (UserID, FriendID, FriendID, UserID))
                 r2 = c2.fetchone()
                 if r2 == True:
                     r2 = 3 # Active friend
@@ -576,8 +576,8 @@ class friends:
             ), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT Friend FROM friends WHERE User = %s', (UserID,))
-            c15 = con.execute('SELECT User FROM friends WHERE Friend = %s', (UserID,))
+            c1 = con.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
+            c15 = con.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
             c2 = con.execute('SELECT SenderID FROM requests WHERE RecieveID = %s', (UserID,))
             c3 = con.execute('SELECT RecieveID FROM requests WHERE SenderID = %s', (UserID,))
             FRIENDS_NOW = [row[0] for row in c1.fetchall()] + [row[0] for row in c15.fetchall()]
