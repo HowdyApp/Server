@@ -585,20 +585,21 @@ class friends:
         
         global con;
         with con.cursor() as cur:
-            cur.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
-            r1 = cur.fetchall()
-            cur.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
-            r2 = cur.fetchall()
-            cur.execute('SELECT Sender FROM requests WHERE Recipient = %s', (UserID,))
-            r3 = cur.fetchall()
-            cur.execute('SELECT Recipient FROM requests WHERE Sender = %s', (UserID,))
-            r4 = cur.fetchall()
+            try:
+                cur.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
+                r1 = cur.fetchall()
+                cur.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
+                r2 = cur.fetchall()
+                cur.execute('SELECT Sender FROM requests WHERE Recipient = %s', (UserID,))
+                r3 = cur.fetchall()
+                cur.execute('SELECT Recipient FROM requests WHERE Sender = %s', (UserID,))
+                r4 = cur.fetchall()
+            except psycopg2.Error as e:
+                log.fatal("Error executing SQL:", e)
+                con.rollback()
             FRIENDS_NOW = [row[0] for row in r1] + [row[0] for row in r2]
             FRIENDS_INVITED = [row[0] for row in r3]
             FRIENDS_SENDED = [row[0] for row in r4]
-            log.debug(f'Friends now: {FRIENDS_NOW}')
-            log.debug(f'Friends invited: {FRIENDS_INVITED}')
-            log.debug(f'Friends sent: {FRIENDS_SENDED}')
             FRIENDS_ALL = FRIENDS_NOW + FRIENDS_INVITED + FRIENDS_SENDED
 
         return jsonify(
