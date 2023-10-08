@@ -73,6 +73,7 @@ class account:
             ), 200
 
         UserID = new.token.user(username, mailadrs)
+        global con;
         with con.cursor as con:
             try:
                 con.execute('INSERT INTO auth (user, mail, pasw, profile, userid) VALUES (?, ?, ?, "https://avataaars.io/?avatarStyle=Circle", ?)', (username, mailadrs, password, UserID))
@@ -104,7 +105,7 @@ class account:
             data = request.get_json()
             mail = data['mail']
             pasw = data['pasw']
-
+            global con;
             with con.cursor as con:
                 c1 = con.execute('SELECT userid FROM auth WHERE mail = ?', (mail,))
                 c2 = con.execute('SELECT pasw FROM auth WHERE mail = ?', (mail,))
@@ -149,7 +150,7 @@ class account:
                 msg = 'Unauthorized!',
                 code = 'unauthorized',
             ), 401
-        
+        global con;
         with con.cursor as con:
                 c1 = con.execute('SELECT user FROM auth WHERE UserID = ?', (UserID,))
                 r1 = (c1.fetchone())[0]
@@ -174,7 +175,7 @@ class account:
                     code = 'unauthorized',
                 ), 401
             
-            
+            global con;
             with con.cursor as con:
                 c1 = con.execute('SELECT pasw FROM auth WHERE userid = ?', (UserID,))
                 r1 = (c1.fetchone())[0]
@@ -189,7 +190,7 @@ class account:
                 msg='There was an unexpected error!',
                 code='error'
             ), 500
-
+        global con;
         with con.cursor as con:
             con.execute('DELETE FROM auth WHERE userid = ?', (UserID,))
             con.execute('DELETE FROM friends WHERE User = ?', (UserID,))
@@ -222,7 +223,7 @@ class account:
                 msg = 'Unauthorized!',
                 code = 'unauthorized',
             ), 401
-        
+        global con;
         with con.cursor as con:
             con.execute('UPDATE auth SET profile = ? WHERE userid = ?', (url, UserID))
         
@@ -247,7 +248,7 @@ class story:
 
         page = int(request.args.get('page', 1))
         log.trace(f'Loading page "{page}".')
-
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
             c2 = con.execute('SELECT User FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
@@ -285,7 +286,7 @@ class story:
         UserID = get.token.session(token)
 
         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
-
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
             r1 = c1.fetchone()
@@ -307,7 +308,7 @@ class story:
         UserID = get.token.session(token)
 
         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
-
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT time, likes FROM images WHERE `ImageID` = ? AND UserID = ?', (image, friend,))
             r1 = c1.fetchone()
@@ -325,7 +326,7 @@ class story:
         UserID = get.token.session(token)
 
         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
-
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT likes FROM images WHERE UserID = ? AND imageID = ?', (friend, image))
             r1 = c1.fetchone()
@@ -352,7 +353,7 @@ class story:
         ImageID = uuid.uuid4()
         ImageID = f'{ImageID}'
         path = f'./images/{UserID}/{ImageID}.jpg'
-
+        global con;
         with con.cursor as con:
             con.execute('INSERT INTO images (UserID, imageID, path, time, likes) VALUES (?, ?, ?, ?, 0)', (UserID, ImageID, path, time,))
 
@@ -381,7 +382,7 @@ class friends:
                 msg = 'Unauthorized!',
                 code = 'unauthorized',
             ), 401
-        
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT userid FROM auth WHERE user = ?', (Friend,))
             r1 = (c1.fetchone())
@@ -421,7 +422,7 @@ class friends:
             msg = 'Unauthorized!',
             code = 'unauthorized',
         ), 401
-
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = ?)', (FriendID,))
             r1 = c1.fetchone()[0]
@@ -452,7 +453,7 @@ class friends:
             msg = 'Unauthorized!',
             code = 'unauthorized',
         ), 401
-
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = ?)', (FriendID,))
             r1 = c1.fetchone()[0]
@@ -475,7 +476,7 @@ class friends:
             msg = 'Unauthorized!',
             code = 'unauthorized',
         ), 401
-
+        global con;
         with con.cursor as con:
             try:
                 con.execute('DELETE FROM friends WHERE Friend = ? AND User = ?', (UserID, Friend,))
@@ -500,6 +501,7 @@ class friends:
             msg = 'Unauthorized!',
             code = 'unauthorized',
         ), 401
+        global con;
         with con.cursor as con:
             try:
                 con.execute('DELETE FROM requests WHERE SenderID = ? AND RecieveID = ?', (UserID, Friend,))
@@ -528,7 +530,7 @@ class friends:
                 msg='Unauthorized!',
                 code='unauthorized',
             ), 401
-        
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (FriendID,))
             c2 = con.execute('SELECT Status FROM requests WHERE (SenderID = ? AND RecieveID = ?);', (FriendID, UserID,))
@@ -560,7 +562,7 @@ class friends:
                 msg='Unauthorized!',
                 code='unauthorized',
             ), 401
-
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT Friend FROM friends WHERE User = ?', (UserID,))
             c15 = con.execute('SELECT User FROM friends WHERE Friend = ?', (UserID,))
@@ -606,7 +608,7 @@ class message:
         # deepcode ignore PT: This section does NOT import the variables from a HTTP source.
         with open(path, "wb") as ws:
             ws.write(base64.decodebytes(Content))
-
+        global con;
         with con.cursor as con:
             con.execute('INSERT INTO messages (User1, User2, Path, Time, Status) VALUES (?, ?, ?, ?, "Sent")', (UserID, toUser, path, Time,))
             c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (UserID,))
@@ -629,7 +631,7 @@ class message:
                 msg='Unauthorized!',
                 code='unauthorized',
             ), 401
-        
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT * FROM messages WHERE User2 = ? AND User1 = ?', (UserID, Friend,))
             r1 = c1.fetchone()
@@ -652,7 +654,7 @@ class message:
                 msg='Unauthorized!',
                 code='unauthorized',
             ), 401
-        
+        global con;
         with con.cursor as con:
             c1 = con.execute('SELECT Path FROM messages WHERE User2 = ?', (UserID,))
             r1 = c1.fetchone()
@@ -688,7 +690,7 @@ class settings:
                 msg = 'Unauthorized!',
                 code = 'unauthorized',
             ), 401
-        
+        global con;
         with con.cursor as con:
             con.execute('INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (?, ?)', (UserID, NotiToken))
         
@@ -708,7 +710,7 @@ class settings:
                 msg = 'Unauthorized!',
                 code = 'unauthorized',
             ), 401
-        
+        global con;
         if(GetID == 'Self'):
             with con.cursor as con:
                 c1 = con.execute('SELECT profile FROM auth WHERE userid = ?', (UserID,))
