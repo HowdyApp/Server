@@ -545,15 +545,15 @@ class friends:
 
             cur.execute('''SELECT user FROM auth WHERE userid = %s''', (FriendID,))
             r1 = cur.fetchone()[0]
-            cur.execute('''SELECT Status FROM requests WHERE (SenderID = %s AND RecieveID = %s);''', (FriendID, UserID,))
+            cur.execute('''SELECT Status FROM requests WHERE (Sender = %s AND Recipient = %s);''', (FriendID, UserID,))
             r2 = cur.fetchone()[0]
-            cur.execute('''SELECT Status FROM requests WHERE (SenderID = %s AND RecieveID = %s);''', (UserID, FriendID,))
+            cur.execute('''SELECT Status FROM requests WHERE (Sender = %s AND Recipient = %s);''', (UserID, FriendID,))
             r3 = cur.fetchone()[0]
             if r2 is not None: status = 1
             elif r3 is not None: status = 2
             else: status = None
-            if r2 is None:
-                cur.execute('SELECT * FROM friends WHERE (User = %s AND Friend = %s) OR (User = %s AND Friend = %s);', (UserID, FriendID, FriendID, UserID))
+            if status is None:
+                cur.execute('SELECT * FROM friends WHERE (User01 = %s AND User02 = %s) OR (User01 = %s AND User02 = %s);', (UserID, FriendID, FriendID, UserID))
                 r2 = cur.fetchone()
                 if (r2):
                     r2 = 3
