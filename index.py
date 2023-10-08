@@ -541,20 +541,31 @@ class friends:
                 msg='Unauthorized!',
                 code='unauthorized',
             ), 401
-        
-        with con.cursor() as con:
-            c1 = con.execute('SELECT user FROM auth WHERE userid = %s', (FriendID,))
-            c2 = con.execute('SELECT Status FROM requests WHERE (Sender = %s AND Recipient = %s);', (FriendID, UserID,))
-            c3 = con.execute('SELECT Status FROM requests WHERE (Sender = %s AND Recipient = %s);', (UserID, FriendID,))
-            if c2.fetchone() is not None: r2 = 1 # Recieved
-            elif c3.fetchone() is not None: r2 = 2 # Sent
-            else: r2 = None
-            if r2 is None:
-                c2 = con.execute('SELECT 1 FROM friends WHERE (User01 = %s AND User02 = %s) OR (User01 = %s AND User02 = %s);', (UserID, FriendID, FriendID, UserID))
-                r2 = c2.fetchone()
-                if r2 == True:
-                    r2 = 3 # Active friend
-            r1 = c1.fetchone()[0]
+            
+        with con.cursor() as cur:
+            cur.execute('SELECT user FROM auth WHERE userid = %s', (FriendID,))
+            result = cur.fetchone()
+            if result:
+                r1 = result[0]
+            else:
+                r1 = None
+            cur.execute('SELECT Status FROM requests WHERE Sender = %s AND Recipient = %s', (FriendID, UserID))
+            result = cur.fetchone()
+            if result:
+                r2 = 1  # Received
+            else:
+                cur.execute('SELECT Status FROM requests WHERE Sender = %s AND Recipient = %s', (UserID, FriendID))
+                result = cur.fetchone()
+                if result:
+                    r2 = 2  # Sent
+                else:
+                    cur.execute('SELECT 1 FROM friends WHERE (User01 = %s AND User02 = %s) OR (User01 = %s AND User02 = %s)',
+                                (UserID, FriendID, FriendID, UserID))
+                    result = cur.fetchone()
+                    if result:
+                        r2 = 3  # Active friend
+                    else:
+                        r2 = None
         
         return jsonify(
             code = 'accepted',
@@ -578,16 +589,12 @@ class friends:
         with con.cursor() as cur:
             cur.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
             FRIENDS_NOW = [row[0] for row in cur.fetchall()]
-
             cur.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
             FRIENDS_NOW += [row[0] for row in cur.fetchall()]
-
             cur.execute('SELECT Sender FROM requests WHERE Recipient = %s', (UserID,))
             FRIENDS_INVITED = [row[0] for row in cur.fetchall()]
-
             cur.execute('SELECT Recipient FROM requests WHERE Sender = %s', (UserID,))
             FRIENDS_SENDED = [row[0] for row in cur.fetchall()]
-
             FRIENDS_ALL = FRIENDS_NOW + FRIENDS_INVITED + FRIENDS_SENDED
 
         return jsonify(
