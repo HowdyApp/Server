@@ -599,6 +599,9 @@ class friends:
             FRIENDS_NOW = [row[0] for row in r1] + [row[0] for row in r2]
             FRIENDS_INVITED = [row[0] for row in r3]
             FRIENDS_SENDED = [row[0] for row in r4]
+            log.debug(f'Friends now: {FRIENDS_NOW}')
+            log.debug(f'Friends invited: {FRIENDS_INVITED}')
+            log.debug(f'Friends sent: {FRIENDS_SENDED}')
             FRIENDS_ALL = FRIENDS_NOW + FRIENDS_INVITED + FRIENDS_SENDED
 
         return jsonify(
