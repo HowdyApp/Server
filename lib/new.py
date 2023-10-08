@@ -88,6 +88,6 @@ class notification:
             token=deviceToken,
         )
         
-        response = messaging.send(message)
-
+        try: response = messaging.send(message)
+        except: return 'errorResponse'
         return response;
