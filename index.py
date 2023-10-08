@@ -306,11 +306,11 @@ class friends:
             code = 'unauthorized',
         ), 401
         with con.cursor() as cur:
-            cur.execute('''SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = %s)''', (FriendID,))
+            cur.execute('''SELECT EXISTS(SELECT 1 FROM requests WHERE Sender = %s)''', (FriendID,))
             r1 = cur.fetchone()[0]
             if (r1 == True):
                 cur.execute('''
-                            DELETE FROM requests WHERE RecieveID = %s
+                            DELETE FROM requests WHERE Reciepent = %s
                             INSERT INTO friends (User01, User02) VALUES (%s, %s)
                             ''', (UserID, UserID, FriendID,))
                 con.commit()
