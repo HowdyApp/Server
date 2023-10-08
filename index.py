@@ -690,8 +690,7 @@ class settings:
     def getpfp():
         token = request.headers.get('auth')
         UserID = get.token.session(token)
-        data = request.get_json()
-        GetID = data['ID']
+        GetID = request.args.get('ID')
         
         if(UserID is None): return jsonify(
                 msg = 'Unauthorized!',
