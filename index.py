@@ -479,20 +479,17 @@ class friends:
             msg = 'Unauthorized!',
             code = 'unauthorized',
         ), 401
-        global con;
+
         with con.cursor() as cur:
             try:
                 cur.execute('''
-                            DELETE FROM friends WHERE User02 = %s AND User01 = %s
-                            DELETE FROM friends WHERE User01 = %s AND User02 = %s 
-                            ''', (UserID, Friend, UserID, Friend))
+                    DELETE FROM friends WHERE (User02 = %s AND User01 = %s)
+                    OR (User01 = %s AND User02 = %s)
+                ''', (UserID, Friend, UserID, Friend))
                 con.commit()
-            except:
-                cur.execute('''
-                            DELETE FROM friends WHERE User01 = %s AND User02 = %s
-                            DELETE FROM friends WHERE User02 = %s AND User01 = %s
-                            ''', (UserID, Friend, UserID, Friend))
-                con.commit()
+            except psycopg2.Error as e:
+                log.fatal("Error executing SQL:", e)
+                con.rollback()
         
         return jsonify(
             code = 'friend_deleted',
