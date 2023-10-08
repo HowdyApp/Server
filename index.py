@@ -72,7 +72,7 @@ class account:
         UserID = new.token.user(username, mailadrs)
         with con.cursor() as con:
             try:
-                con.execute('INSERT INTO auth (user, mail, pasw, profile, userid) VALUES (?, ?, ?, "https://avataaars.io/?avatarStyle=Circle", ?)', (username, mailadrs, password, UserID))
+                con.execute('INSERT INTO auth (user, mail, pasw, profile, userid) VALUES (%s, %s, %s, "https://avataaars.io/?avatarStyle=Circle", %s)', (username, mailadrs, password, UserID))
                 con.commit()
                 sessionToken = new.token.session(UserID)
                 return jsonify(
@@ -104,8 +104,8 @@ class account:
             pasw = data['pasw']
 
             with con.cursor() as con:
-                c1 = con.execute('SELECT userid FROM auth WHERE mail = ?', (mail,))
-                c2 = con.execute('SELECT pasw FROM auth WHERE mail = ?', (mail,))
+                c1 = con.execute('SELECT userid FROM auth WHERE mail = %s', (mail,))
+                c2 = con.execute('SELECT pasw FROM auth WHERE mail = %s', (mail,))
                 r1 = c1.fetchone()
                 if r1 is not None:
                     r1 = r1[0]
@@ -150,7 +150,7 @@ class account:
             ), 401
         
         with con.cursor() as con:
-                c1 = con.execute('SELECT user FROM auth WHERE UserID = ?', (UserID,))
+                c1 = con.execute('SELECT user FROM auth WHERE UserID = %s', (UserID,))
                 r1 = (c1.fetchone())[0]
         
         return jsonify(
@@ -176,7 +176,7 @@ class account:
             
             
             with con.cursor() as con:
-                c1 = con.execute('SELECT pasw FROM auth WHERE userid = ?', (UserID,))
+                c1 = con.execute('SELECT pasw FROM auth WHERE userid = %s', (UserID,))
                 r1 = (c1.fetchone())[0]
                 r2 = get.password.check(pasw, r1)
                 if not(r2): return jsonify(
@@ -191,11 +191,11 @@ class account:
             ), 500
 
         with con.cursor() as con:
-            con.execute('DELETE FROM auth WHERE userid = ?', (UserID,))
-            con.execute('DELETE FROM friends WHERE User = ?', (UserID,))
-            con.execute('DELETE FROM friends WHERE Friend = ?', (UserID,))
-            con.execute('DELETE FROM tokens WHERE UserID = ?', (UserID,))
-            con.execute('DELETE FROM images WHERE UserID = ?', (UserID,))
+            con.execute('DELETE FROM auth WHERE userid = %s', (UserID,))
+            con.execute('DELETE FROM friends WHERE User = %s', (UserID,))
+            con.execute('DELETE FROM friends WHERE Friend = %s', (UserID,))
+            con.execute('DELETE FROM tokens WHERE UserID = %s', (UserID,))
+            con.execute('DELETE FROM images WHERE UserID = %s', (UserID,))
             # deepcode ignore PT: <please specify a reason of ignoring this>
             try: shutil.rmtree(f'./images/{UserID}')
             except: ''
@@ -225,7 +225,7 @@ class account:
             ), 401
         
         with con.cursor() as con:
-            con.execute('UPDATE auth SET profile = ? WHERE userid = ?', (url, UserID))
+            con.execute('UPDATE auth SET profile = %s WHERE userid = %s', (url, UserID))
         
         return jsonify(
             code='success',
@@ -251,14 +251,14 @@ class story:
         log.trace(f'Loading page "{page}".')
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
-            c2 = con.execute('SELECT User FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
+            c1 = con.execute('SELECT Friend FROM friends WHERE User = %s OR Friend = %s', (UserID, UserID,))
+            c2 = con.execute('SELECT User FROM friends WHERE User = %s OR Friend = %s', (UserID, UserID,))
             r1 = c1.fetchall() + c2.fetchall()
             friends = [row[0] for row in r1]
             pairs = set()  # Gebruik een set om dubbele afbeeldingen te vermijden
 
             for friend in friends:
-                c3 = con.execute('SELECT ImageID FROM images WHERE UserID = ? ORDER BY time', (friend,))
+                c3 = con.execute('SELECT ImageID FROM images WHERE UserID = %s ORDER BY time', (friend,))
                 r3 = c3.fetchall()
                 for image_row in r3:
                     pairs.add(f"{friend}/{image_row[0]}")
@@ -290,7 +290,7 @@ class story:
         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
+            c1 = con.execute('SELECT Friend FROM friends WHERE User = %s OR Friend = %s', (UserID, UserID,))
             r1 = c1.fetchone()
             if (r1): r1 = True
             else: r1 = False
@@ -313,7 +313,7 @@ class story:
         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT time, likes FROM images WHERE `ImageID` = ? AND UserID = ?', (image, friend,))
+            c1 = con.execute('SELECT time, likes FROM images WHERE `ImageID` = %s AND UserID = %s', (image, friend,))
             r1 = c1.fetchone()
         
         return jsonify(
@@ -332,10 +332,10 @@ class story:
         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT likes FROM images WHERE UserID = ? AND imageID = ?', (friend, image))
+            c1 = con.execute('SELECT likes FROM images WHERE UserID = %s AND imageID = %s', (friend, image))
             r1 = c1.fetchone()
             likes = int(r1[0]) + 1
-            c2 = con.execute('UPDATE images SET likes = ? WHERE UserID = ? AND imageID = ?'), (likes, friend, image)
+            c2 = con.execute('UPDATE images SET likes = %s WHERE UserID = %s AND imageID = %s'), (likes, friend, image)
         
         return jsonify(
             code = 'Success!',
@@ -360,7 +360,7 @@ class story:
         path = f'./images/{UserID}/{ImageID}.jpg'
 
         with con.cursor() as con:
-            con.execute('INSERT INTO images (UserID, imageID, path, time, likes) VALUES (?, ?, ?, ?, 0)', (UserID, ImageID, path, time,))
+            con.execute('INSERT INTO images (UserID, imageID, path, time, likes) VALUES (%s, %s, %s, %s, 0)', (UserID, ImageID, path, time,))
 
         directory = os.path.dirname(path)
         if not os.path.exists(directory):
@@ -390,7 +390,7 @@ class friends:
             ), 401
         
         with con.cursor() as con:
-            c1 = con.execute('SELECT userid FROM auth WHERE user = ?', (Friend,))
+            c1 = con.execute('SELECT userid FROM auth WHERE user = %s', (Friend,))
             r1 = (c1.fetchone())
             if r1 is None: return jsonify(
                 msg="Unauthorized!", code = 'unauthorized',
@@ -398,7 +398,7 @@ class friends:
             r1 = r1[0]
             
             try:
-                con.execute('INSERT INTO requests (SenderID, RecieveID, Status) VALUES (?, ?, "Pending")', (UserID, r1,))
+                con.execute('INSERT INTO requests (SenderID, RecieveID, Status) VALUES (%s, %s, "Pending")', (UserID, r1,))
             except psycopg2.IntegrityError as e:
                 error = str(e)
                 if 'check_sender_receiver_not_equal' in error:
@@ -431,12 +431,12 @@ class friends:
         ), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = ?)', (FriendID,))
+            c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = %s)', (FriendID,))
             r1 = c1.fetchone()[0]
             if (r1 == True):
-                con.execute('DELETE FROM requests WHERE RecieveID = ?', (UserID,))
-                con.execute('INSERT INTO friends (User, Friend) VALUES (?, ?)', (UserID, FriendID))
-                c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (UserID,))
+                con.execute('DELETE FROM requests WHERE RecieveID = %s', (UserID,))
+                con.execute('INSERT INTO friends (User, Friend) VALUES (%s, %s)', (UserID, FriendID))
+                c1 = con.execute('SELECT user FROM auth WHERE userid = %s', (UserID,))
                 r1 = (c1.fetchone())[0]
                 new.notification.push('Nieuwe vriend!', f'{r1} heeft je toegevoegd als vriend! (Klik om een bericht te versturen!)', FriendID)
                 return jsonify(
@@ -463,10 +463,10 @@ class friends:
         ), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = ?)', (FriendID,))
+            c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = %s)', (FriendID,))
             r1 = c1.fetchone()[0]
             if (r1 == True):
-                con.execute('DELETE FROM requests WHERE RecieveID = ?', UserID)
+                con.execute('DELETE FROM requests WHERE RecieveID = %s', UserID)
 
         return jsonify(
             code = 'friend_rejected',
@@ -488,11 +488,11 @@ class friends:
 
         with con.cursor() as con:
             try:
-                con.execute('DELETE FROM friends WHERE Friend = ? AND User = ?', (UserID, Friend,))
-                con.execute('DELETE FROM friends WHERE User = ? AND Friend = ?', (UserID, Friend,))
+                con.execute('DELETE FROM friends WHERE Friend = %s AND User = %s', (UserID, Friend,))
+                con.execute('DELETE FROM friends WHERE User = %s AND Friend = %s', (UserID, Friend,))
             except:
-                con.execute('DELETE FROM friends WHERE User = ? AND Friend = ?', (UserID, Friend,))
-                con.execute('DELETE FROM friends WHERE Friend = ? AND User = ?', (UserID, Friend,))   
+                con.execute('DELETE FROM friends WHERE User = %s AND Friend = %s', (UserID, Friend,))
+                con.execute('DELETE FROM friends WHERE Friend = %s AND User = %s', (UserID, Friend,))   
         
         return jsonify(
             code = 'friend_deleted',
@@ -514,7 +514,7 @@ class friends:
 
         with con.cursor() as con:
             try:
-                con.execute('DELETE FROM requests WHERE SenderID = ? AND RecieveID = ?', (UserID, Friend,))
+                con.execute('DELETE FROM requests WHERE SenderID = %s AND RecieveID = %s', (UserID, Friend,))
             except:
                 return jsonify(
                     code='failed',
@@ -543,14 +543,14 @@ class friends:
             ), 401
         
         with con.cursor() as con:
-            c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (FriendID,))
-            c2 = con.execute('SELECT Status FROM requests WHERE (SenderID = ? AND RecieveID = ?);', (FriendID, UserID,))
-            c3 = con.execute('SELECT Status FROM requests WHERE (SenderID = ? AND RecieveID = ?);', (UserID, FriendID,))
+            c1 = con.execute('SELECT user FROM auth WHERE userid = %s', (FriendID,))
+            c2 = con.execute('SELECT Status FROM requests WHERE (SenderID = %s AND RecieveID = %s);', (FriendID, UserID,))
+            c3 = con.execute('SELECT Status FROM requests WHERE (SenderID = %s AND RecieveID = %s);', (UserID, FriendID,))
             if c2.fetchone() is not None: r2 = 1 # Recieved
             elif c3.fetchone() is not None: r2 = 2 # Sent
             else: r2 = None
             if r2 is None:
-                c2 = con.execute('SELECT 1 FROM friends WHERE (User = ? AND Friend = ?) OR (User = ? AND Friend = ?);', (UserID, FriendID, FriendID, UserID))
+                c2 = con.execute('SELECT 1 FROM friends WHERE (User = %s AND Friend = %s) OR (User = %s AND Friend = %s);', (UserID, FriendID, FriendID, UserID))
                 r2 = c2.fetchone()
                 if r2 == True:
                     r2 = 3 # Active friend
@@ -576,10 +576,10 @@ class friends:
             ), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT Friend FROM friends WHERE User = ?', (UserID,))
-            c15 = con.execute('SELECT User FROM friends WHERE Friend = ?', (UserID,))
-            c2 = con.execute('SELECT SenderID FROM requests WHERE RecieveID = ?', (UserID,))
-            c3 = con.execute('SELECT RecieveID FROM requests WHERE SenderID = ?', (UserID,))
+            c1 = con.execute('SELECT Friend FROM friends WHERE User = %s', (UserID,))
+            c15 = con.execute('SELECT User FROM friends WHERE Friend = %s', (UserID,))
+            c2 = con.execute('SELECT SenderID FROM requests WHERE RecieveID = %s', (UserID,))
+            c3 = con.execute('SELECT RecieveID FROM requests WHERE SenderID = %s', (UserID,))
             FRIENDS_NOW = [row[0] for row in c1.fetchall()] + [row[0] for row in c15.fetchall()]
             FRIENDS_INVITED = [row[0] for row in c2.fetchall()]
             FRIENDS_SENDED = [row[0] for row in c3.fetchall()]
@@ -623,8 +623,8 @@ class message:
             ws.write(base64.decodebytes(Content))
 
         with con.cursor() as con:
-            con.execute('INSERT INTO messages (User1, User2, Path, Time, Status) VALUES (?, ?, ?, ?, "Sent")', (UserID, toUser, path, Time,))
-            c1 = con.execute('SELECT user FROM auth WHERE userid = ?', (UserID,))
+            con.execute('INSERT INTO messages (User1, User2, Path, Time, Status) VALUES (%s, %s, %s, %s, "Sent")', (UserID, toUser, path, Time,))
+            c1 = con.execute('SELECT user FROM auth WHERE userid = %s', (UserID,))
             r1 = (c1.fetchone())[0]
             new.notification.push('Nieuw bericht!', f'{r1} heeft je een nieuw bericht gestuurd. Klik om te bekijken!', toUser)
         
@@ -647,7 +647,7 @@ class message:
             ), 401
         
         with con.cursor() as con:
-            c1 = con.execute('SELECT * FROM messages WHERE User2 = ? AND User1 = ?', (UserID, Friend,))
+            c1 = con.execute('SELECT * FROM messages WHERE User2 = %s AND User1 = %s', (UserID, Friend,))
             r1 = c1.fetchone()
             if r1: return jsonify(
                 code='new_messages_available',
@@ -671,7 +671,7 @@ class message:
             ), 401
         
         with con.cursor() as con:
-            c1 = con.execute('SELECT Path FROM messages WHERE User2 = ?', (UserID,))
+            c1 = con.execute('SELECT Path FROM messages WHERE User2 = %s', (UserID,))
             r1 = c1.fetchone()
 
             if r1 is None:
@@ -680,7 +680,7 @@ class message:
                     msg='There where no new messages.'
                 ), 400
             
-            con.execute('DELETE FROM messages WHERE User2 = ?', (UserID,))
+            con.execute('DELETE FROM messages WHERE User2 = %s', (UserID,))
 
             try:
                 # deepcode ignore PT: This sends a file, does not import a file or changes anything to the source.
@@ -708,7 +708,7 @@ class settings:
             ), 401
         
         with con.cursor() as con:
-            con.execute('INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (?, ?)', (UserID, NotiToken))
+            con.execute('INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (%s, %s)', (UserID, NotiToken))
         
         return jsonify(
             code='Success',
@@ -730,7 +730,7 @@ class settings:
         
         if(GetID == 'Self'):
             with con.cursor() as con:
-                c1 = con.execute('SELECT profile FROM auth WHERE userid = ?', (UserID,))
+                c1 = con.execute('SELECT profile FROM auth WHERE userid = %s', (UserID,))
                 r1 = c1.fetchone()
             return jsonify(
                 code='Success',
@@ -738,7 +738,7 @@ class settings:
             ), 200
         else:
             with con.cursor() as con:
-                c1 = con.execute('SELECT profile FROM auth WHERE userid = ?', (GetID,))
+                c1 = con.execute('SELECT profile FROM auth WHERE userid = %s', (GetID,))
                 r1 = c1.fetchone()
             return jsonify(
                 code='Success',
