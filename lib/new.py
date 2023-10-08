@@ -34,6 +34,8 @@ con = psycopg2.connect(
     port=DBHOSTPORT
 );
 
+con.autocommit(True);
+
 cred = credentials.Certificate('storage/storyshare-notifications.json')
 firebase_admin.initialize_app(cred)
 

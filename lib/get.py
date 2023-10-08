@@ -16,7 +16,9 @@ con = psycopg2.connect(
     password=DBPASSWORD,
     host=DBHOSTNAME,
     port=DBHOSTPORT
-)
+);
+
+con.autocommit(True);
 
 class token:
     @staticmethod
