@@ -32,7 +32,6 @@ DBUSERNAME = dotenv.get_key('/app/storage/db.key', 'username')
 DBPASSWORD = dotenv.get_key('/app/storage/db.key', 'password')
 DBHOSTNAME = dotenv.get_key('/app/storage/db.key', 'host')
 DBHOSTPORT = dotenv.get_key('/app/storage/db.key', 'port')
-# DATABASE = './storage/db.sqlite'
 DATABASE = f'dbname=main user={DBUSERNAME} password={DBPASSWORD} host={DBHOSTNAME} port={DBHOSTPORT}'
 
 app = Flask(__name__)
@@ -42,6 +41,7 @@ con = psycopg2.connect(DATABASE)
 @app.before_request
 def beforeRequest():
     global con
+    con = psycopg2.connect(DATABASE)
     log.session(f'Endpoint request --> {request.endpoint}')
 
 class web:
