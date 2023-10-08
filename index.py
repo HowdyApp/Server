@@ -744,7 +744,7 @@ class settings:
             ), 401
         if(GetID == 'Self'):
             with con.cursor() as cur:
-                cur.execute('''SELECT profile FROM auth WHERE userid = %s''', (UserID,))
+                cur.execute('''SELECT profilepicture FROM auth WHERE userid = %s''', (UserID,))
                 r1 = cur.fetchone()
             return jsonify(
                 code='Success',
@@ -752,7 +752,7 @@ class settings:
             ), 200
         else:
             with con.cursor() as cur:
-                cur.execute('''SELECT profile FROM auth WHERE userid = %s''', (GetID,))
+                cur.execute('''SELECT profilepicture FROM auth WHERE userid = %s''', (GetID,))
                 r1 = cur.fetchone()
             return jsonify(
                 code='Success',
