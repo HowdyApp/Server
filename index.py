@@ -152,7 +152,7 @@ class account:
             ), 401
 
         with con.cursor() as cur:
-                cur.execute('''SELECT user FROM auth WHERE userid = %s''', (UserID,))
+                cur.execute('''SELECT username FROM auth WHERE userid = %s''', (UserID,))
                 r1 = (cur.fetchone())[0]
         
         return jsonify(
@@ -429,10 +429,10 @@ class friends:
             if (r1 == True):
                 cur.execute('''
                             DELETE FROM requests WHERE RecieveID = %s
-                            INSERT INTO friends (User, Friend) VALUES (%s, %s)
+                            INSERT INTO friends (User01, User02) VALUES (%s, %s)
                             ''', (UserID, UserID, FriendID,))
                 con.commit()
-                cur.execute('''SELECT user FROM auth WHERE userid = %s''', (UserID,))
+                cur.execute('''SELECT username FROM auth WHERE userid = %s''', (UserID,))
                 r1 = (cur.fetchone())[0]
                 new.notification.push('Nieuwe vriend!', f'{r1} heeft je toegevoegd als vriend! (Klik om een bericht te versturen!)', FriendID)
                 return jsonify(
@@ -638,7 +638,7 @@ class message:
             ws.write(base64.decodebytes(Content))
         global con;
         with con.cursor() as cur:
-            cur.execute('''INSERT INTO messages (User1, User2, Path, Time, Status) VALUES (%s, %s, %s, %s, "Sent")''', (UserID, toUser, path, Time,))
+            cur.execute('''INSERT INTO messages (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, "Sent")''', (UserID, toUser, path, Time,))
             con.commit()
             cur.execute('''SELECT user FROM auth WHERE userid = %s''', (UserID,))
             r1 = cur.fetchone()
@@ -661,7 +661,7 @@ class message:
                 code='unauthorized',
             ), 401
         with con.cursor() as cur:
-            cur.execute('''SELECT * FROM messages WHERE User2 = %s AND User1 = %s''', (UserID, Friend,))
+            cur.execute('''SELECT * FROM messages WHERE User02 = %s AND User01 = %s''', (UserID, Friend,))
             r1 = cur.fetchone()
             if r1: return jsonify(
                 code='new_messages_available',
@@ -684,7 +684,7 @@ class message:
             ), 401
         global con;
         with con.cursor() as cur:
-            cur.execute('''SELECT Path FROM messages WHERE User2 = %s''', (UserID,))
+            cur.execute('''SELECT Path FROM messages WHERE User02 = %s''', (UserID,))
             r1 = cur.fetchone()
 
             if r1 is None:
@@ -693,7 +693,7 @@ class message:
                     msg='There where no new messages.'
                 ), 400
             
-            cur.execute('''DELETE FROM messages WHERE User2 = %s''', (UserID,))
+            cur.execute('''DELETE FROM messages WHERE User02 = %s''', (UserID,))
             con.commit()
 
             try:
