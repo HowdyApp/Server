@@ -4,7 +4,6 @@ from lib import log
 import sqlite3
 from datetime import datetime
 import bcrypt
-from lib import log
 
 DBUSERNAME = dotenv.get_key('/app/storage/db.key', 'username')
 DBPASSWORD = dotenv.get_key('/app/storage/db.key', 'password')
@@ -17,13 +16,14 @@ con = psycopg2.connect(
     password=DBPASSWORD,
     host=DBHOSTNAME,
     port=DBHOSTPORT
-);
+)
 
-class token:
+class Token:
+    @staticmethod
     def session(key):
         try:
-            global con;
-            with con.cursor as cur:
+            global con
+            with con.cursor() as cur:
                 cur.execute('''SELECT UserID, Expiration FROM tokens WHERE Token = %s LIMIT 1''', (key,))
                 r1 = cur.fetchone()
                 if r1:
@@ -34,7 +34,8 @@ class token:
             log.error(e)
             raise e
 
-class password:
+class Password:
+    @staticmethod
     def check(password, database):
         try:
             if not isinstance(password, (str, bytes)):
@@ -47,6 +48,6 @@ class password:
             if isinstance(database, bytes):
                 database = database.decode()
 
-            return bcrypt.hashpw(str(password), str(database))
+            return bcrypt.hashpw(password.encode(), database.encode())
         except Exception as e:
             raise e
