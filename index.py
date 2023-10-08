@@ -207,7 +207,25 @@ class account:
             msg = 'Your account is deleted!',
             code = 'account_deleted',
         ), 202
-    
+    @app.route('/account/resetTokens', methods=['POST'])
+    def resetTokens():
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+        
+        if UserID is None:
+            return jsonify(
+                msg = 'Unauthorized!',
+                code = 'unauthorized',
+            ), 401
+        
+        with con.cursor() as cur:
+            cur.execute('DELETE FROM tokens WHERE userid = %s', (UserID,))
+        
+        return jsonify(
+            code='Success',
+            msg='Your account has been secured.'
+        ), 200
+
     @app.route('/account/profile/set', methods=['POST'])
     def setProfile():
         data = request.get_json()
@@ -232,145 +250,7 @@ class account:
             code='success',
             msg='User profile updated successfully!'
         )
-
-        
-
-# class story:
-#     @app.route('/story', methods=['GET'])
-#     def home():
-#         token = request.headers.get('auth')
-#         UserID = get.token.session(token)
-
-#         if UserID is None:
-#             return jsonify(
-#                 msg='Unauthorized!',
-#                 code='unauthorized',
-#             ), 401
-
-#         page = int(request.args.get('page', 1))
-#         log.trace(f'Loading page "{page}".')
-#         global con;
-#         with con.cursor as con:
-#             c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
-#             c2 = con.execute('SELECT User FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
-#             r1 = c1.fetchall() + c2.fetchall()
-#             friends = [row[0] for row in r1]
-#             pairs = set()  # Gebruik een set om dubbele afbeeldingen te vermijden
-
-#             for friend in friends:
-#                 c3 = con.execute('SELECT ImageID FROM images WHERE UserID = ? ORDER BY time', (friend,))
-#                 r3 = c3.fetchall()
-#                 for image_row in r3:
-#                     pairs.add(f"{friend}/{image_row[0]}")
-
-#         pairs = list(pairs)  # Zet de set terug in een lijst
-
-#         start_index = (page - 1) * 15
-#         end_index = start_index + 15
-
-#         next_images = pairs[start_index:end_index]
-
-#         return jsonify(
-#             code='success',
-#             msg='Loaded all friends!',
-#             images=next_images
-#         ), 200
-
-#     @app.route('/story/<int:page>', methods=['GET'])
-#     def home_page(page):
-#         return redirect(url_for('home', page=page))
-
-
-#     @app.route('/story/<friend>/<image>', methods=['GET'])
-#     def image(friend, image):
-#         token = request.headers.get('auth')
-#         UserID = get.token.session(token)
-
-#         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
-#         global con;
-#         with con.cursor as con:
-#             c1 = con.execute('SELECT Friend FROM friends WHERE User = ? OR Friend = ?', (UserID, UserID,))
-#             r1 = c1.fetchone()
-#             if (r1): r1 = True
-#             else: r1 = False
-#             if r1 is False: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
-
-#         pathdir = f'images/{friend}'
-#         pathimg = f'{image}.jpg'
-
-#         try:
-#             return send_from_directory(pathdir, pathimg)
-#         except FileNotFoundError:
-#             return jsonify(code='cftf', msg='Bestaat niet!')
-
-#     @app.route('/story/<friend>/<image>/info', methods=['GET'])
-#     def imageInfo(friend, image):
-#         token = request.headers.get('auth')
-#         UserID = get.token.session(token)
-
-#         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
-#         global con;
-#         with con.cursor as con:
-#             c1 = con.execute('SELECT time, likes FROM images WHERE `ImageID` = ? AND UserID = ?', (image, friend,))
-#             r1 = c1.fetchone()
-        
-#         return jsonify(
-#             code='Success',
-#             msg='The data-fetch was successful!',
-#             time=r1[0],
-#             likes=r1[1],
-#         ), 200
-        
-#     @app.route('/story/<friend>/<image>/like', methods=['POST'])
-#     def like(friend, image):
-#         token = request.headers.get('auth')
-#         UserID = get.token.session(token)
-
-#         if UserID is None: return jsonify(msg = 'Unauthorized!', code = 'unauthorized',), 401
-#         global con;
-#         with con.cursor as con:
-#             c1 = con.execute('SELECT likes FROM images WHERE UserID = ? AND imageID = ?', (friend, image))
-#             r1 = c1.fetchone()
-#             likes = int(r1[0]) + 1
-#             c2 = con.execute('UPDATE images SET likes = ? WHERE UserID = ? AND imageID = ?'), (likes, friend, image)
-        
-#         return jsonify(
-#             code = 'Success!',
-#             msg = 'Like count has been updated!'
-#         ), 200
-#     @app.route('/story/new', methods=['POST'])
-#     def new():
-#         data = request.get_json()
-#         image = data['img'].encode()
-#         token = request.headers.get('auth')
-#         UserID = get.token.session(token)
-#         time = datetime.datetime.now()
-
-#         if(UserID is None): return jsonify(
-#                 msg = 'Unauthorized!',
-#                 code = 'unauthorized',
-#             ), 401
-        
-#         ImageID = uuid.uuid4()
-#         ImageID = f'{ImageID}'
-#         path = f'./images/{UserID}/{ImageID}.jpg'
-#         global con;
-#         with con.cursor as con:
-#             con.execute('INSERT INTO images (UserID, imageID, path, time, likes) VALUES (?, ?, ?, ?, 0)', (UserID, ImageID, path, time,))
-
-#         directory = os.path.dirname(path)
-#         if not os.path.exists(directory):
-#             os.makedirs(directory)
-        
-#         # deepcode ignore PT: It opens a path what is stored in our database.
-#         with open(path, "wb") as ws:
-#             ws.write(base64.decodebytes(image))
-            
-#         return jsonify(
-#             msg = 'The image is uploaded successfully!',
-#             code = 'image_upload_success',
-#         ), 200
-
+    
 class friends:
     @app.route('/friends/add', methods=['POST'])
     def add():
@@ -769,7 +649,6 @@ class settings:
                 code='Success',
                 url=r1[0],
             ), 200
-
 
 if __name__ == '__main__':
     app.run()
