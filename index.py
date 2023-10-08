@@ -575,14 +575,19 @@ class friends:
                 code='unauthorized',
             ), 401
 
-        with con.cursor() as con:
-            c1 = con.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
-            c15 = con.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
-            c2 = con.execute('SELECT Sender FROM requests WHERE Recipient = %s', (UserID,))
-            c3 = con.execute('SELECT Recipient FROM requests WHERE Sender = %s', (UserID,))
-            FRIENDS_NOW = [row[0] for row in c1.fetchall()] + [row[0] for row in c15.fetchall()]
-            FRIENDS_INVITED = [row[0] for row in c2.fetchall()]
-            FRIENDS_SENDED = [row[0] for row in c3.fetchall()]
+        with con.cursor() as cur:
+            cur.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
+            FRIENDS_NOW = [row[0] for row in cur.fetchall()]
+
+            cur.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
+            FRIENDS_NOW += [row[0] for row in cur.fetchall()]
+
+            cur.execute('SELECT Sender FROM requests WHERE Recipient = %s', (UserID,))
+            FRIENDS_INVITED = [row[0] for row in cur.fetchall()]
+
+            cur.execute('SELECT Recipient FROM requests WHERE Sender = %s', (UserID,))
+            FRIENDS_SENDED = [row[0] for row in cur.fetchall()]
+
             FRIENDS_ALL = FRIENDS_NOW + FRIENDS_INVITED + FRIENDS_SENDED
 
         return jsonify(
