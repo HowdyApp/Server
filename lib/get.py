@@ -1,25 +1,35 @@
+import dotenv
+import psycopg2
 from lib import log
 import sqlite3
 from datetime import datetime
 import bcrypt
 from lib import log
 
-DATABASE = './storage/db.sqlite'
+DBUSERNAME = dotenv.get_key('/app/storage/db.key', 'username')
+DBPASSWORD = dotenv.get_key('/app/storage/db.key', 'password')
+DBHOSTNAME = dotenv.get_key('/app/storage/db.key', 'host')
+DBHOSTPORT = dotenv.get_key('/app/storage/db.key', 'port')
+
+con = psycopg2.connect(
+    dbname='main',
+    user=DBUSERNAME,
+    password=DBPASSWORD,
+    host=DBHOSTNAME,
+    port=DBHOSTPORT
+);
 
 class token:
     def session(key):
         try:
-            with sqlite3.connect(DATABASE) as con:
-                c1 = con.execute('SELECT UserID, Expiration FROM tokens WHERE Token = ? LIMIT 1', (key,))
-                r1 = c1.fetchone()
+            global con;
+            with con.cursor as cur:
+                cur.execute('''SELECT UserID, Expiration FROM tokens WHERE Token = %s LIMIT 1''', (key,))
+                r1 = cur.fetchone()
                 if r1:
-                    user_id, expiration_date_str = r1
-                    #! Not needed because of that we are implementing a MOBILE app.
-                    # expiration_date_str = expiration_date_str.split('.')[0]
-                    # expiration_date = datetime.strptime(expiration_date_str, "%Y-%m-%d %H:%M:%S")
-                    # if expiration_date > datetime.now():
-                    return user_id
-                return None
+                    return r1[0]
+                else:
+                    return None
         except Exception as e:
             log.error(e)
             raise e

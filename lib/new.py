@@ -5,6 +5,9 @@
 
 from datetime import datetime
 from datetime import timedelta
+import dotenv
+
+import psycopg2
 
 from lib import log
 
@@ -18,7 +21,18 @@ import base64
 import bcrypt
 import sqlite3
 
-DATABASE = './storage/db.sqlite'
+DBUSERNAME = dotenv.get_key('/app/storage/db.key', 'username')
+DBPASSWORD = dotenv.get_key('/app/storage/db.key', 'password')
+DBHOSTNAME = dotenv.get_key('/app/storage/db.key', 'host')
+DBHOSTPORT = dotenv.get_key('/app/storage/db.key', 'port')
+
+con = psycopg2.connect(
+    dbname='main',
+    user=DBUSERNAME,
+    password=DBPASSWORD,
+    host=DBHOSTNAME,
+    port=DBHOSTPORT
+);
 
 cred = credentials.Certificate('storage/storyshare-notifications.json')
 firebase_admin.initialize_app(cred)
@@ -29,8 +43,9 @@ class token:
             key = uuid.uuid4()
             key = base64.b64encode(str(key).encode()).decode()
             date = datetime.now() + timedelta(days=7)
-            with sqlite3.connect(DATABASE) as con:
-                con.execute('INSERT INTO tokens (Token, UserID, Expiration) VALUES (?,?,?)', (key, UserID, date))
+            with con.cursor() as cur:
+                cur.execute('''INSER TINTO tokens (Token, UserID, Expiration) VALUES (%s, %s, %s)''', (key, UserID, date))
+                con.commit()
             return key
         except Exception as e:
             log.error(e)
@@ -60,17 +75,17 @@ class password:
 
 class notification:
     def push(MSG_title, MSG_content, UserID):
-        with sqlite3.connect(DATABASE) as con:
-            c1 = con.execute('SELECT Token FROM FCMToken WHERE UserID = ?', (UserID,))
-            device_token = (c1.fetchone())[0]
-            log.debug(device_token)
-        
+        with con.cursor() as cur:
+            cur.execute('SELECT Token FROM FCMToken WHERE UserID = ?', (UserID,))
+            deviceToken = cur.fetchone()[0]
+            log.debug(deviceToken)
+            
         message = messaging.Message(
             notification=messaging.Notification(
                 title=MSG_title,
                 body=MSG_content
             ),
-            token=device_token,
+            token=deviceToken,
         )
         
         response = messaging.send(message)
