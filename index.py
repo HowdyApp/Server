@@ -207,6 +207,7 @@ class account:
             msg = 'Your account is deleted!',
             code = 'account_deleted',
         ), 202
+    
     @app.route('/account/resetTokens', methods=['POST'])
     def resetTokens():
         token = request.headers.get('auth')
@@ -220,7 +221,7 @@ class account:
         
         with con.cursor() as cur:
             cur.execute('DELETE FROM tokens WHERE userid = %s', (UserID,))
-            log.debug(f'DELETE FROM tokens WHERE userid = \'{UserID}\'')
+            con.commit()
         
         return jsonify(
             code='Success',
