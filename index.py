@@ -392,7 +392,7 @@ class friends:
             r1 = r1[0]
             
             try:
-                cur.execute('''INSERT INTO requests (SenderID, RecieveID, Status) VALUES (%s, %s, "Pending")''', (UserID, r1,))
+                cur.execute('''INSERT INTO requests (Sender, Recipient, Status) VALUES (%s, %s, "Pending")''', (UserID, r1,))
                 con.commit()
             except psycopg2.IntegrityError as e:
                 error = str(e)
