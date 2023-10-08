@@ -36,7 +36,6 @@ DATABASE = f'dbname=main user={DBUSERNAME} password={DBPASSWORD} host={DBHOSTNAM
 
 app = Flask(__name__)
 CORS(app)
-global con
 con = psycopg2.connect(DATABASE)
 
 @app.before_request
@@ -57,6 +56,7 @@ class web:
 class account:
     @app.route('/account/register', methods=['POST'])
     def register():
+        global con
         data = request.get_json()
 
         username = data['user']
@@ -97,6 +97,7 @@ class account:
 
     @app.route('/account/login', methods=['POST'])
     def login():
+        global con
         try:
             data = request.get_json()
             mail = data['mail']
@@ -138,6 +139,7 @@ class account:
     
     @app.route('/account/me', methods=['POST'])
     def me():
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -158,6 +160,7 @@ class account:
 
     @app.route('/account/delete', methods=['POST'])
     def delete():
+        global con
         try:
             data = request.get_json()
             pasw = str(data['pasw']).encode('utf-8')
@@ -204,6 +207,7 @@ class account:
     
     @app.route('/account/profile/set', methods=['POST'])
     def setProfile():
+        global con
         data = request.get_json()
         url = data['url']
         token = request.headers.get('auth')
@@ -233,6 +237,7 @@ class account:
 class story:
     @app.route('/story', methods=['GET'])
     def home():
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -278,6 +283,7 @@ class story:
 
     @app.route('/story/<friend>/<image>', methods=['GET'])
     def image(friend, image):
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -300,6 +306,7 @@ class story:
 
     @app.route('/story/<friend>/<image>/info', methods=['GET'])
     def imageInfo(friend, image):
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -318,6 +325,7 @@ class story:
         
     @app.route('/story/<friend>/<image>/like', methods=['POST'])
     def like(friend, image):
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -335,6 +343,7 @@ class story:
         ), 200
     @app.route('/story/new', methods=['POST'])
     def new():
+        global con
         data = request.get_json()
         image = data['img'].encode()
         token = request.headers.get('auth')
@@ -369,6 +378,7 @@ class story:
 class friends:
     @app.route('/friends/add', methods=['POST'])
     def add():
+        global con
         data = request.get_json()
         Friend = data['friend']
         token = request.headers.get('auth')
@@ -409,6 +419,7 @@ class friends:
 
     @app.route('/friends/accept', methods=['POST'])
     def accept():
+        global con
         data = request.get_json()
         FriendID = data['friend']
         token = request.headers.get('auth')
@@ -440,6 +451,7 @@ class friends:
 
     @app.route('/friends/reject', methods=['POST'])
     def reject():
+        global con
         data = request.get_json()
         FriendID = data['friend']
         token = request.headers.get('auth')
@@ -463,6 +475,7 @@ class friends:
 
     @app.route('/friends/remove', methods=['POST'])
     def remove():
+        global con
         data = request.get_json()
         Friend = data['friend']
         token = request.headers.get('auth')
@@ -488,6 +501,7 @@ class friends:
     
     @app.route('/friends/cancel', methods=['POST'])
     def cancelRequest():
+        global con
         data = request.get_json()
         Friend = data['friend']
         token = request.headers.get('auth')
@@ -516,6 +530,7 @@ class friends:
 
     @app.route('/friends/info', methods=['POST'])
     def getinfo():
+        global con
         data = request.get_json()
         FriendID = data['FriendID']
         token = request.headers.get('auth')
@@ -550,6 +565,7 @@ class friends:
 
     @app.route('/friends/list', methods=['GET'])
     def list_friends():
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -579,6 +595,7 @@ class friends:
 class message:
     @app.route('/messages/send', methods=['POST'])
     def sendMessages():
+        global con
         data = request.get_json()
         toUser = data['UserID']
         Content = (data['Content']).encode()
@@ -619,6 +636,7 @@ class message:
     
     @app.route('/messages/query/<Friend>', methods=['GET'])
     def queryMessage(Friend):
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -642,6 +660,7 @@ class message:
 
     @app.route('/messages/read/<Friend>', methods=['GET'])
     def readMessages(Friend):
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -677,6 +696,7 @@ class message:
 class settings:
     @app.route('/add/FCMToken', methods=['POST'])
     def FCMToken():
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
         data = request.get_json();
@@ -697,6 +717,7 @@ class settings:
     
     @app.route('/data/profile', methods=['GET'])
     def getpfp():
+        global con
         token = request.headers.get('auth')
         UserID = get.token.session(token)
         GetID = request.args.get('ID')
