@@ -98,7 +98,6 @@ class home:
 
     @app.route('/home/<friend>/<image>', methods=['GET'])
     def image(friend, image):
-        log.success('Loaded an new image!')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -121,7 +120,6 @@ class home:
 
     @app.route('/home/<friend>/<image>/info', methods=['GET'])
     def imageInfo(friend, image):
-        log.success('Loaded an new image!')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -140,7 +138,6 @@ class home:
         
     @app.route('/home/<friend>/<image>/like', methods=['POST'])
     def like(friend, image):
-        log.success('Liked image!')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -160,7 +157,6 @@ class home:
 class account:
     @app.route('/account/register', methods=['POST'])
     def register():
-        log.success('New registration!')
         data = request.get_json()
 
         username = data['user']
@@ -201,7 +197,6 @@ class account:
 
     @app.route('/account/login', methods=['POST'])
     def login():
-        log.success('Login successful')
         try:
             data = request.get_json()
             mail = data['mail']
@@ -243,7 +238,6 @@ class account:
     
     @app.route('/account/me', methods=['POST'])
     def me():
-        log.success('Account info')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -264,7 +258,6 @@ class account:
 
     @app.route('/account/delete', methods=['POST'])
     def delete():
-        log.success('Deleted account')
         try:
             data = request.get_json()
             pasw = str(data['pasw']).encode('utf-8')
@@ -308,11 +301,38 @@ class account:
             msg = 'Your account is deleted!',
             code = 'account_deleted',
         ), 202
+    @app.route('/account/profile/set', methods=['POST'])
+    def setProfile():
+        data = request.get_json()
+        url = data['url']
+        token = request.headers.get('auth')
+
+        UserID = get.token.session(token)
+
+        if UserID is None:
+            return jsonify(
+                msg = 'Unauthorized!',
+                code = 'unauthorized',
+            ), 401
+        
+        if not re.match(r'^https://avataaars\.io\?.*', url): return jsonify(
+                msg = 'Unauthorized!',
+                code = 'unauthorized',
+            ), 401
+        
+        with sqlite3.connect(DATABASE) as con:
+            con.execute('UPDATE auth SET profile = ? WHERE userid = ?', (url, UserID))
+        
+        return jsonify(
+            code='success',
+            msg='User profile updated successfully!'
+        )
+
+        
 
 class camera:
     @app.route('/cam/new', methods=['POST'])
     def new():
-        log.success('New upload to story.')
         data = request.get_json()
         image = data['img'].encode()
         token = request.headers.get('auth')
@@ -347,7 +367,6 @@ class camera:
 class friends:
     @app.route('/friends/add', methods=['POST'])
     def add():
-        log.success('Sended a new friend request.')
         data = request.get_json()
         Friend = data['friend']
         token = request.headers.get('auth')
@@ -388,7 +407,6 @@ class friends:
 
     @app.route('/friends/accept', methods=['POST'])
     def accept():
-        log.success('Accepted a friend')
         data = request.get_json()
         FriendID = data['friend']
         token = request.headers.get('auth')
@@ -420,7 +438,6 @@ class friends:
 
     @app.route('/friends/reject', methods=['POST'])
     def reject():
-        log.success('Rejected a friend.')
         data = request.get_json()
         FriendID = data['friend']
         token = request.headers.get('auth')
@@ -444,7 +461,6 @@ class friends:
 
     @app.route('/friends/remove', methods=['POST'])
     def remove():
-        log.success('Removed a friend.')
         data = request.get_json()
         Friend = data['friend']
         token = request.headers.get('auth')
@@ -470,7 +486,6 @@ class friends:
     
     @app.route('/friends/cancel', methods=['POST'])
     def cancelRequest():
-        log.success('Canceled a request.')
         data = request.get_json()
         Friend = data['friend']
         token = request.headers.get('auth')
@@ -498,7 +513,6 @@ class friends:
 
     @app.route('/friends/info', methods=['POST'])
     def getinfo():
-        log.success('Loaded status of friend.')
         data = request.get_json()
         FriendID = data['FriendID']
         token = request.headers.get('auth')
@@ -533,7 +547,6 @@ class friends:
 
     @app.route('/friends/list', methods=['GET'])
     def list_friends():
-        log.success('Listed all the friends.')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -563,7 +576,6 @@ class friends:
 class message:
     @app.route('/messages/send', methods=['POST'])
     def sendMessages():
-        log.success('Sent a message.')
         data = request.get_json()
         toUser = data['UserID']
         Content = (data['Content']).encode()
@@ -604,7 +616,6 @@ class message:
     
     @app.route('/messages/query/<Friend>', methods=['GET'])
     def queryMessage(Friend):
-        log.success('Quered a message status.')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -628,7 +639,6 @@ class message:
 
     @app.route('/messages/read/<Friend>', methods=['GET'])
     def readMessages(Friend):
-        log.success('Read a message')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -664,7 +674,6 @@ class message:
 class settings:
     @app.route('/add/FCMToken', methods=['POST'])
     def FCMToken():
-        log.success('Added a new notification token.')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
         data = request.get_json();
