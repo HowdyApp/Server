@@ -747,13 +747,16 @@ class settings:
                 try:
                     cur.execute('''SELECT profilepicture FROM auth WHERE userid = %s''', (UserID,))
                     r1 = cur.fetchone()
+                    return jsonify(
+                        code='Success',
+                        url=r1[0],
+                    ), 200
                 except psycopg2.Error as e:
                     log.fatal(e)
                     con.rollback()
-            return jsonify(
-                code='Success',
-                url=r1[0],
-            ), 200
+                    return jsonify(
+                        code='Fatal',
+                    ), 400
         else:
             with con.cursor() as cur:
                 try:
