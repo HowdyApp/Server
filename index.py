@@ -542,7 +542,7 @@ class friends:
             ), 401
 
         with con.cursor() as cur:
-            cur.execute('''SELECT user FROM auth WHERE userid = %s''', (FriendID,))
+            cur.execute('''SELECT username FROM auth WHERE userid = %s''', (FriendID,))
             r1 = cur.fetchone()[0]
             cur.execute('''SELECT Status FROM requests WHERE (Sender = %s AND Recipient = %s);''', (FriendID, UserID,))
             r2 = cur.fetchone()
@@ -562,7 +562,6 @@ class friends:
                 if r2:
                     r2 = 3
 
-        
         #? --- INFO ---
         # 1 = Send
         # 2 = Recieved
