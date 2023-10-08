@@ -44,7 +44,7 @@ class token:
             key = base64.b64encode(str(key).encode()).decode()
             date = datetime.now() + timedelta(days=7)
             with con.cursor() as cur:
-                cur.execute('''INSER TINTO tokens (Token, UserID, Expiration) VALUES (%s, %s, %s)''', (key, UserID, date))
+                cur.execute('''INSERT INTO tokens (Token, UserID, Expiration) VALUES (%s, %s, %s)''', (key, UserID, date))
                 con.commit()
             return key
         except Exception as e:
@@ -79,7 +79,7 @@ class notification:
             cur.execute('SELECT Token FROM FCMToken WHERE UserID = ?', (UserID,))
             deviceToken = cur.fetchone()[0]
             log.debug(deviceToken)
-            
+
         message = messaging.Message(
             notification=messaging.Notification(
                 title=MSG_title,
