@@ -41,6 +41,7 @@ con = psycopg2.connect(DATABASE)
 
 @app.before_request
 def beforeRequest():
+    global con
     log.session(f'Endpoint request --> {request.endpoint}')
 
 class web:
