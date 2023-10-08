@@ -584,13 +584,13 @@ class friends:
         
         global con;
         with con.cursor as cur:
-            cur.execute('SELECT Friend FROM friends WHERE User = %s', (UserID,))
+            cur.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
             r1 = cur.fetchone()
-            cur.execute('SELECT User FROM friends WHERE Friend = %s', (UserID,))
+            cur.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
             r2 = cur.fetchone()
-            cur.execute('SELECT SenderID FROM requests WHERE RecieveID = %s', (UserID,))
+            cur.execute('SELECT Sender FROM requests WHERE Recipient = %s', (UserID,))
             r3 = cur.fetchone()
-            cur.execute('SELECT RecieveID FROM requests WHERE SenderID = %s', (UserID,))
+            cur.execute('SELECT Recipient FROM requests WHERE Sender = %s', (UserID,))
             r4 = cur.fetchone()
             FRIENDS_NOW = [row[0] for row in r1] + [row[0] for row in r2]
             FRIENDS_INVITED = [row[0] for row in r3]
