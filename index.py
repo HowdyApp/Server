@@ -64,7 +64,7 @@ class account:
         UserID = new.token.user(username, mailadrs)
         with sqlite3.connect(DATABASE) as con:
             try:
-                con.execute('INSERT INTO auth (user, mail, pasw, userid) VALUES (?, ?, ?, ?)', (username, mailadrs, password, UserID))
+                con.execute('INSERT INTO auth (user, mail, pasw, profile, userid) VALUES (?, ?, ?, "https://avataaars.io/?avatarStyle=Circle", ?)', (username, mailadrs, password, UserID))
                 con.commit()
                 sessionToken = new.token.session(UserID)
                 return jsonify(
@@ -691,6 +691,7 @@ class settings:
         token = request.headers.get('auth')
         UserID = get.token.session(token)
         GetID = request.args.get('ID')
+        log.debug(GetID)
         
         if(UserID is None): return jsonify(
                 msg = 'Unauthorized!',
@@ -701,6 +702,7 @@ class settings:
             with sqlite3.connect(DATABASE) as con:
                 c1 = con.execute('SELECT profile FROM auth WHERE userid = ?', (UserID,))
                 r1 = c1.fetchone()
+                log.debug(f'Self Containing: {r1}')
             return jsonify(
                 code='Success',
                 url=r1,
@@ -709,6 +711,7 @@ class settings:
             with sqlite3.connect(DATABASE) as con:
                 c1 = con.execute('SELECT profile FROM auth WHERE userid = ?', (GetID,))
                 r1 = c1.fetchone()
+                log.debug(f'Custom: {r1}')
             return jsonify(
                 code='Success',
                 url=r1,
