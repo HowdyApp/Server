@@ -686,7 +686,7 @@ class settings:
             msg='Notification token has been added!'
         ), 200
     
-    @app.route('/data/profile')
+    @app.route('/data/profile', methods=['GET'])
     def getpfp():
         token = request.headers.get('auth')
         UserID = get.token.session(token)
