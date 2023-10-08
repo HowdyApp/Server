@@ -220,7 +220,7 @@ class account:
         
         with con.cursor() as cur:
             cur.execute('DELETE FROM tokens WHERE userid = %s', (UserID,))
-            log.debug('DELETE FROM tokens WHERE userid = %s', (UserID,))
+            log.debug(f'DELETE FROM tokens WHERE userid = \'{UserID}\'')
         
         return jsonify(
             code='Success',
