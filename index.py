@@ -398,7 +398,7 @@ class friends:
             r1 = r1[0]
             
             try:
-                con.execute('INSERT INTO requests (SenderID, RecieveID, Status) VALUES (%s, %s, "Pending")', (UserID, r1,))
+                con.execute('INSERT INTO requests (Sender, Recipient, Status) VALUES (%s, %s, "Pending")', (UserID, r1,))
             except psycopg2.IntegrityError as e:
                 error = str(e)
                 if 'check_sender_receiver_not_equal' in error:
@@ -431,7 +431,7 @@ class friends:
         ), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = %s)', (FriendID,))
+            c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE Sender = %s)', (FriendID,))
             r1 = c1.fetchone()[0]
             if (r1 == True):
                 con.execute('DELETE FROM requests WHERE RecieveID = %s', (UserID,))
@@ -463,7 +463,7 @@ class friends:
         ), 401
 
         with con.cursor() as con:
-            c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE SenderID = %s)', (FriendID,))
+            c1 = con.execute('SELECT EXISTS(SELECT 1 FROM requests WHERE Sender = %s)', (FriendID,))
             r1 = c1.fetchone()[0]
             if (r1 == True):
                 con.execute('DELETE FROM requests WHERE RecieveID = %s', UserID)
@@ -514,7 +514,7 @@ class friends:
 
         with con.cursor() as con:
             try:
-                con.execute('DELETE FROM requests WHERE SenderID = %s AND RecieveID = %s', (UserID, Friend,))
+                con.execute('DELETE FROM requests WHERE Sender = %s AND Recipient = %s', (UserID, Friend,))
             except:
                 return jsonify(
                     code='failed',
@@ -544,8 +544,8 @@ class friends:
         
         with con.cursor() as con:
             c1 = con.execute('SELECT user FROM auth WHERE userid = %s', (FriendID,))
-            c2 = con.execute('SELECT Status FROM requests WHERE (SenderID = %s AND RecieveID = %s);', (FriendID, UserID,))
-            c3 = con.execute('SELECT Status FROM requests WHERE (SenderID = %s AND RecieveID = %s);', (UserID, FriendID,))
+            c2 = con.execute('SELECT Status FROM requests WHERE (Sender = %s AND Recipient = %s);', (FriendID, UserID,))
+            c3 = con.execute('SELECT Status FROM requests WHERE (Sender = %s AND Recipient = %s);', (UserID, FriendID,))
             if c2.fetchone() is not None: r2 = 1 # Recieved
             elif c3.fetchone() is not None: r2 = 2 # Sent
             else: r2 = None
@@ -578,8 +578,8 @@ class friends:
         with con.cursor() as con:
             c1 = con.execute('SELECT User02 FROM friends WHERE User01 = %s', (UserID,))
             c15 = con.execute('SELECT User01 FROM friends WHERE User02 = %s', (UserID,))
-            c2 = con.execute('SELECT SenderID FROM requests WHERE RecieveID = %s', (UserID,))
-            c3 = con.execute('SELECT RecieveID FROM requests WHERE SenderID = %s', (UserID,))
+            c2 = con.execute('SELECT Sender FROM requests WHERE Recipient = %s', (UserID,))
+            c3 = con.execute('SELECT Recipient FROM requests WHERE Sender = %s', (UserID,))
             FRIENDS_NOW = [row[0] for row in c1.fetchall()] + [row[0] for row in c15.fetchall()]
             FRIENDS_INVITED = [row[0] for row in c2.fetchall()]
             FRIENDS_SENDED = [row[0] for row in c3.fetchall()]
