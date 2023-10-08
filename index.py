@@ -297,12 +297,12 @@ class account:
             msg = 'Your account is deleted!',
             code = 'account_deleted',
         ), 202
+    
     @app.route('/account/profile/set', methods=['POST'])
     def setProfile():
         data = request.get_json()
         url = data['url']
         token = request.headers.get('auth')
-
         UserID = get.token.session(token)
 
         if UserID is None:
@@ -311,7 +311,7 @@ class account:
                 code = 'unauthorized',
             ), 401
         
-        if not re.match(r'^https://avataaars\.io\?.*', url): return jsonify(
+        if not re.match(r'^https://avataaars\.io', url): return jsonify(
                 msg = 'Unauthorized!',
                 code = 'unauthorized',
             ), 401
