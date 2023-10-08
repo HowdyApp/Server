@@ -392,7 +392,7 @@ class friends:
             r1 = r1[0]
             
             try:
-                con.execute('''INSERT INTO requests (SenderID, RecieveID, Status) VALUES (%s, %s, "Pending")''', (UserID, r1,))
+                cur.execute('''INSERT INTO requests (SenderID, RecieveID, Status) VALUES (%s, %s, "Pending")''', (UserID, r1,))
                 con.commit()
             except psycopg2.IntegrityError as e:
                 error = str(e)
@@ -721,8 +721,9 @@ class settings:
                 code = 'unauthorized',
             ), 401
         global con;
-        with con.cursor() as con:
-            con.execute('''INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (%s, %s)''', (UserID, NotiToken))
+        with con.cursor() as cur:
+            cur.execute('''INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (%s, %s)''', (UserID, NotiToken))
+            con.commit()
         
         return jsonify(
             code='Success',
