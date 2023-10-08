@@ -226,7 +226,7 @@ class account:
                 code = 'unauthorized',
             ), 401
         with con.cursor() as cur:
-            cur.execute('''UPDATE auth SET profile = %s WHERE userid = %s''', (url, UserID))
+            cur.execute('''UPDATE auth SET profilepicture = %s WHERE userid = %s''', (url, UserID))
             con.commit()        
         return jsonify(
             code='success',
