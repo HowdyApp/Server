@@ -510,7 +510,7 @@ class friends:
         global con;
         with con.cursor() as cur:
             try:
-                cur.execute('''DELETE FROM requests WHERE SenderID = %s AND RecieveID = %s''', (UserID, Friend,))
+                cur.execute('''DELETE FROM requests WHERE Sender = %s AND Recipient = %s''', (UserID, Friend,))
                 con.commit()
             except:
                 return jsonify(
