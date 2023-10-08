@@ -720,11 +720,12 @@ class settings:
                 msg = 'Unauthorized!',
                 code = 'unauthorized',
             ), 401
-        global con;
-        with con.cursor() as cur:
-            cur.execute('''INSERT OR REPLACE INTO FCMToken (UserID, Token) VALUES (%s, %s)''', (UserID, NotiToken))
-            con.commit()
         
+        with con.cursor() as cur:
+            cur.execute('''INSERT INTO FCMToken (UserID, Token) VALUES (%s, %s) 
+                        ON CONFLICT (UserID) DO UPDATE SET Token = EXCLUDED.Token''', (UserID, NotiToken))
+            con.commit()
+
         return jsonify(
             code='Success',
             msg='Notification token has been added!'
