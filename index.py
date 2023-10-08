@@ -542,21 +542,26 @@ class friends:
             ), 401
 
         with con.cursor() as cur:
-
             cur.execute('''SELECT user FROM auth WHERE userid = %s''', (FriendID,))
             r1 = cur.fetchone()[0]
             cur.execute('''SELECT Status FROM requests WHERE (Sender = %s AND Recipient = %s);''', (FriendID, UserID,))
-            r2 = cur.fetchone()[0]
+            r2 = cur.fetchone()
             cur.execute('''SELECT Status FROM requests WHERE (Sender = %s AND Recipient = %s);''', (UserID, FriendID,))
-            r3 = cur.fetchone()[0]
-            if r2 is not None: status = 1
-            elif r3 is not None: status = 2
-            else: status = None
+            r3 = cur.fetchone()
+            if r2 is not None:
+                r2 = r2[0]
+                status = 1
+            elif r3 is not None:
+                r3 = r3[0]
+                status = 2
+            else:
+                status = None
             if status is None:
                 cur.execute('SELECT * FROM friends WHERE (User01 = %s AND User02 = %s) OR (User01 = %s AND User02 = %s);', (UserID, FriendID, FriendID, UserID))
                 r2 = cur.fetchone()
-                if (r2):
+                if r2:
                     r2 = 3
+
         
         #? --- INFO ---
         # 1 = Send
