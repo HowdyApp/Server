@@ -117,7 +117,7 @@ class account:
                     code = 'invalid_credentials'
                 ), 401
 
-                cur.execute('''SELECT pass FROM auth WHERE mail = ?''', (mail,))
+                cur.execute('''SELECT pass FROM auth WHERE mail = %s''', (mail,))
                 r2 = (cur.fetchone())[0]
 
                 r2 = get.password.check(pasw, r2)
@@ -553,7 +553,7 @@ class friends:
             elif r3 is not None: status = 2
             else: status = None
             if r2 is None:
-                cur.execute('SELECT * FROM friends WHERE (User = %s AND Friend = ?) OR (User = %s AND Friend = %s);', (UserID, FriendID, FriendID, UserID))
+                cur.execute('SELECT * FROM friends WHERE (User = %s AND Friend = %s) OR (User = %s AND Friend = %s);', (UserID, FriendID, FriendID, UserID))
                 r2 = cur.fetchone()
                 if (r2):
                     r2 = 3
