@@ -384,7 +384,7 @@ class friends:
                 code = 'unauthorized',
             ), 401
         with con.cursor() as cur:
-            cur.execute('''SELECT userid FROM auth WHERE username = %s''')
+            cur.execute('''SELECT userid FROM auth WHERE username = %s''', (Friend))
             r1 = (cur.fetchone())
             if r1 is None: return jsonify(
                 msg="Unauthorized!", code = 'unauthorized',
