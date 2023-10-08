@@ -28,10 +28,10 @@ import dotenv
 import datetime
 import re
 
-DBUSERNAME = dotenv.get_key('/storage/db.key', 'username')
-DBPASSWORD = dotenv.get_key('/storage/db.key', 'password')
-DBHOSTNAME = dotenv.get_key('/storage/db.key', 'host')
-DBHOSTPORT = dotenv.get_key('/storage/db.key', 'port')
+DBUSERNAME = dotenv.get_key('/app/storage/db.key', 'username')
+DBPASSWORD = dotenv.get_key('/app/storage/db.key', 'password')
+DBHOSTNAME = dotenv.get_key('/app/storage/db.key', 'host')
+DBHOSTPORT = dotenv.get_key('/app/storage/db.key', 'port')
 # DATABASE = './storage/db.sqlite'
 DATABASE = f'dbname=main user={DBUSERNAME} password={DBPASSWORD} host={DBHOSTNAME} port={DBHOSTPORT}'
 
