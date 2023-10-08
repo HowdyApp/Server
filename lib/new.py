@@ -76,7 +76,7 @@ class password:
 class notification:
     def push(MSG_title, MSG_content, UserID):
         with con.cursor() as cur:
-            cur.execute('SELECT Token FROM FCMToken WHERE UserID = ?', (UserID,))
+            cur.execute('SELECT Token FROM FCMToken WHERE UserID = %s', (UserID,))
             deviceToken = cur.fetchone()[0]
             log.debug(deviceToken)
 
