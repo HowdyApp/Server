@@ -488,7 +488,7 @@ class friends:
                 ''', (UserID, Friend, UserID, Friend))
                 con.commit()
             except psycopg2.Error as e:
-                log.fatal("Error executing SQL:", e)
+                log.fatal(e)
                 con.rollback()
         
         return jsonify(
@@ -743,16 +743,24 @@ class settings:
             ), 401
         if(GetID == 'Self'):
             with con.cursor() as cur:
-                cur.execute('''SELECT profilepicture FROM auth WHERE userid = %s''', (UserID,))
-                r1 = cur.fetchone()
+                try:
+                    cur.execute('''SELECT profilepicture FROM auth WHERE userid = %s''', (UserID,))
+                    r1 = cur.fetchone()
+                except psycopg2.Error as e:
+                    log.fatal(e)
+                    con.rollback()
             return jsonify(
                 code='Success',
                 url=r1[0],
             ), 200
         else:
             with con.cursor() as cur:
-                cur.execute('''SELECT profilepicture FROM auth WHERE userid = %s''', (GetID,))
-                r1 = cur.fetchone()
+                try:
+                    cur.execute('''SELECT profilepicture FROM auth WHERE userid = %s''', (GetID,))
+                    r1 = cur.fetchone()
+                except psycopg2.Error as e:
+                    log.fatal(e)
+                    con.rollback()
             return jsonify(
                 code='Success',
                 url=r1[0],
