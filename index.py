@@ -55,6 +55,8 @@ class web:
     def logo(): return send_file('web/howdy.png')
     @app.route('/terms-of-service')
     def tos(): return send_file('app/legal.txt')
+    @app.route('/privacy-policy')
+    def pp(): return send_file('app/privacy.txt')
 
 
 class account:
