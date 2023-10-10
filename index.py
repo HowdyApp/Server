@@ -253,6 +253,27 @@ class account:
             msg='User profile updated successfully!'
         )
     
+    @app.route('/account/deleteImages')
+    def deleteImages():
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+        
+        if(UserID is None): return jsonify(
+                msg = 'Unauthorized!',
+                code = 'unauthorized',
+            ), 401
+        
+        shutil.rmtree(f'./images/{UserID}')
+        
+        with con.cursor() as cur:
+            cur.execute('DELETE FROM messages WHERE User01 = %s', (UserID));
+            cur.execute('DELETE FROM images WHERE UserID = %s', (UserID));
+
+        return jsonify(
+            code='Success',
+            msg='All your images has been deleted successfully!'
+        ), 200
+
 class friends:
     @app.route('/friends/add', methods=['POST'])
     def add():
