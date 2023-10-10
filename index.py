@@ -521,7 +521,12 @@ class message:
             ws.write(base64.decodebytes(Content))
 
         with con.cursor() as cur:
-            cur.execute('''INSERT INTO messages (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, 'Sent')''', (UserID, toUser, path, Time,))
+            cur.execute('''
+                        INSERT INTO messages (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, 'Sent')
+                        UPDATE auth
+                        SET score = score + 1
+                        WHERE UserID = %s;
+                        ''', (UserID, toUser, path, Time, UserID,))
             con.commit()
             cur.execute('''SELECT user FROM auth WHERE userid = %s''', (UserID,))
             r1 = cur.fetchone()
