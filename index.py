@@ -552,7 +552,7 @@ class message:
                         WHERE UserID = %s;
                         ''', (UserID, toUser, path, Time, UserID,))
             con.commit()
-            cur.execute('''SELECT user FROM auth WHERE userid = %s''', (UserID,))
+            cur.execute('''SELECT username FROM auth WHERE userid = %s''', (UserID,))
             r1 = cur.fetchone()
             new.notification.push('Nieuw bericht!', f'{r1} heeft je een nieuw bericht gestuurd. Klik om te bekijken!', toUser)
         
