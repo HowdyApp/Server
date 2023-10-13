@@ -546,11 +546,15 @@ class message:
 
         with con.cursor() as cur:
             cur.execute('''
-                        INSERT INTO messages (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, 'Sent')
-                        UPDATE auth
-                        SET score = score + 1
-                        WHERE UserID = %s;
-                        ''', (UserID, toUser, path, Time, UserID,))
+                INSERT INTO messages (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, 'Sent');
+            ''', (UserID, toUser, path, Time))
+
+            cur.execute('''
+                UPDATE auth
+                SET score = score + 1
+                WHERE UserID = %s;
+            ''', (UserID,))
+
             con.commit()
             cur.execute('''SELECT username FROM auth WHERE userid = %s''', (UserID,))
             r1 = cur.fetchone()
