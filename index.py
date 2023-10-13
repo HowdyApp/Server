@@ -557,7 +557,7 @@ class message:
 
             con.commit()
             cur.execute('''SELECT username FROM auth WHERE userid = %s''', (UserID,))
-            r1 = cur.fetchone()
+            r1 = (cur.fetchone())[0]
             new.notification.push('Nieuw bericht!', f'{r1} heeft je een nieuw bericht gestuurd. Klik om te bekijken!', toUser)
         
         return jsonify(
