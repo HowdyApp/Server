@@ -84,7 +84,6 @@ class notification:
             notification=messaging.Notification(
                 title=MSG_title,
                 body=MSG_content,
-                sound="default",
             ),
             token=deviceToken,
         )
