@@ -328,6 +328,7 @@ class friends:
             msg = 'Unauthorized!',
             code = 'unauthorized',
         ), 401
+        
         with con.cursor() as cur:
             cur.execute('''SELECT EXISTS(SELECT 1 FROM requests WHERE Sender = %s)''', (FriendID,))
             r1 = cur.fetchone()[0]
