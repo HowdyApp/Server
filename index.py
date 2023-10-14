@@ -576,7 +576,7 @@ class message:
             messages = cur.fetchall();
             dataContent = []
             for message in messages:
-                LocalUserID = int(message[1])
+                LocalUserID = message[1]
                 cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (LocalUserID,))
                 Username = cur.fetchone()[0]
                 JSON = {
