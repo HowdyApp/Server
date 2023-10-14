@@ -543,7 +543,6 @@ class message:
             ), 401
 
             if Type == 'txt':
-                Type = 'text'
                 log.debug('Starting operation for messaging')
                 cur.execute('''INSERT INTO messages (User01, User02, Content, Time, Type,) VALUES (%s, %s, %s, %s, %s,)''', (UserID, Recv, Content, Time, Type,))
                 con.commit()
@@ -572,7 +571,7 @@ class message:
             ), 401
     
         with con.cursor() as cur:
-            cur.execute('''SELECT * FROM messages WHERE (User01 = %s AND User02 = %s) OR (User01 = %s AND User02 = %s)''', (UserID, FriendID, FriendID, UserID));
+            cur.execute('''SELECT * FROM messages WHERE (User01 = %s AND User02 = %s) OR (User01 = %s AND User02 = %s)''', (UserID, FriendID, FriendID, UserID))
             messages = cur.fetchall();
             dataContent = []
             for message in messages:
