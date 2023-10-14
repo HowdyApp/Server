@@ -268,7 +268,7 @@ class account:
         shutil.rmtree(f'./images/{UserID}')
         
         with con.cursor() as cur:
-            cur.execute('DELETE FROM messages WHERE User01 = %s', (UserID));
+            cur.execute('DELETE FROM ptu WHERE User01 = %s', (UserID));
             cur.execute('DELETE FROM images WHERE UserID = %s', (UserID));
 
         return jsonify(
@@ -546,7 +546,7 @@ class message:
 
         with con.cursor() as cur:
             cur.execute('''
-                INSERT INTO messages (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, 'Sent');
+                INSERT INTO ptu (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, 'Sent');
             ''', (UserID, toUser, path, Time))
 
             cur.execute('''
@@ -577,7 +577,7 @@ class message:
                 code='unauthorized',
             ), 401
         with con.cursor() as cur:
-            cur.execute('''SELECT * FROM messages WHERE User02 = %s AND User01 = %s''', (UserID, Friend,))
+            cur.execute('''SELECT * FROM ptu WHERE User02 = %s AND User01 = %s''', (UserID, Friend,))
             r1 = cur.fetchone()
             if r1: return jsonify(
                 code='new_messages_available',
@@ -600,7 +600,7 @@ class message:
             ), 401
         global con;
         with con.cursor() as cur:
-            cur.execute('''SELECT Path FROM messages WHERE User02 = %s''', (UserID,))
+            cur.execute('''SELECT Path FROM ptu WHERE User02 = %s''', (UserID,))
             r1 = cur.fetchone()
 
             if r1 is None:
@@ -609,7 +609,7 @@ class message:
                     msg='There where no new messages.'
                 ), 400
             
-            cur.execute('''DELETE FROM messages WHERE User02 = %s''', (UserID,))
+            cur.execute('''DELETE FROM ptu WHERE User02 = %s''', (UserID,))
             con.commit()
 
             try:
