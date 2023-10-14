@@ -528,6 +528,14 @@ class message:
             token = request.headers.get('auth')
             UserID = get.token.session(token)
 
+            log.debug(data)
+            log.debug(Content)
+            log.debug(Time)
+            log.debug(Recv)
+            log.debug(Type)
+            log.debug(token)
+            log.debug(UserID)
+
             if UserID is None:
                 return jsonify(
                     msg='Unauthorized!',
