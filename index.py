@@ -576,17 +576,18 @@ class message:
             messages = cur.fetchall();
             dataContent = []
             for message in messages:
-                LocalUserID = int(message['User01'])
+                LocalUserID = int(message[1])
                 cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (LocalUserID,))
+                Username = cur.fetchone()[0]
                 JSON = {
                     "author": {
-                        "firstName": message['firstName'],
-                        "id": message['User01'],
+                        "firstName": Username,
+                        "id": message[0],
                     },
-                    "createdAt": message['Time'],
-                    "id": message['id'],
-                    "text": message['text'],
-                    "type": message['type']
+                    "createdAt": message[4],
+                    "id": message[0],
+                    "text": message[3],
+                    "type": message[5]
                 }
                 
                 dataContent.append(JSON)
