@@ -582,7 +582,7 @@ class message:
                 JSON = {
                     "author": {
                         "firstName": Username,
-                        "id": message[0],
+                        "id": message[1],
                     },
                     "createdAt": int(message[4]),
                     "id": int(message[0]),
