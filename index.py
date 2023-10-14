@@ -545,10 +545,12 @@ class message:
             cur.execute('''SELECT User01, User02 FROM friends WHERE User01 = %s OR User02 = %s''', (UserID, UserID))
             r1 = cur.fetchone()[0]
             r2 = cur.fetchone()[1]
-            if r1 or r2 != Recv: return jsonify(
-                msg='Unauthorized!',
-                code='unauthorized',
-            ), 401
+            if r1 or r2 != Recv:
+                log.debug('Unauthorized! --> User did not match Channel.')
+                return jsonify(
+                    msg='Unauthorized!',
+                    code='unauthorized',
+                ), 401
 
             if Type == 'txt':
                 log.debug('Starting operation for messaging')
