@@ -584,8 +584,8 @@ class message:
                         "firstName": Username,
                         "id": message[0],
                     },
-                    "createdAt": message[4],
-                    "id": message[0],
+                    "createdAt": int(message[4]),
+                    "id": int(message[0]),
                     "text": message[3],
                     "type": message[5]
                 }
