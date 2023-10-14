@@ -24,6 +24,7 @@ import json
 import shutil
 import dotenv
 import datetime
+import time
 import re
 
 DBUSERNAME = dotenv.get_key('/app/storage/db.key', 'username')
@@ -193,10 +194,10 @@ class account:
             ), 500
             
         with con.cursor() as cur:
+            # TODO: Add all the tables.
             cur.execute('''
                         DELETE FROM auth WHERE userid = %s
-                        DELETE FROM friends WHERE User = %s
-                        DELETE FROM friends WHERE Friend = %s
+                        DELETE FROM friends WHERE User01 OR User02 = %s
                         DELETE FROM tokens WHERE UserID = %s
                         DELETE FROM images WHERE UserID = %s
                         ''', (UserID, UserID, UserID, UserID, UserID))
@@ -516,112 +517,81 @@ class friends:
         ), 200
 
 class message:
-    @app.route('/messages/send', methods=['POST'])
-    def sendMessages():
-        data = request.get_json()
-        toUser = data['UserID']
-        Content = (data['Content']).encode()
-        Time = datetime.datetime.now()
-
-        token = request.headers.get('auth')
-        UserID = get.token.session(token)
-
-        if UserID is None:
-            return jsonify(
-                msg='Unauthorized!',
-                code='unauthorized',
-            ), 401
-        
-        ImageID = uuid.uuid4()
-        ImageID = f'{ImageID}'
-        path = f'./images/{UserID}/{ImageID}.jpg'
-        directory = os.path.dirname(path)
-
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-        # deepcode ignore PT: This section does NOT import the variables from a HTTP source.
-        with open(path, "wb") as ws:
-            ws.write(base64.decodebytes(Content))
-
+    @app.route('/messages/add', methods=['POST'])
+    def sendMessage():
         with con.cursor() as cur:
-            cur.execute('''
-                INSERT INTO ptu (User01, User02, Path, Time, Status) VALUES (%s, %s, %s, %s, 'Sent');
-            ''', (UserID, toUser, path, Time))
+            data = request.get_json()
+            Content = data['Content']
+            Time = int(time.time() * 1000)
+            Recv = data['Channel']
+            Type = data['Type']
+            token = request.headers.get('auth')
+            UserID = get.token.session(token)
 
-            cur.execute('''
-                UPDATE auth
-                SET score = score + 1
-                WHERE UserID = %s;
-            ''', (UserID,))
-
-            con.commit()
-            cur.execute('''SELECT username FROM auth WHERE userid = %s''', (UserID,))
-            r1 = (cur.fetchone())[0]
-            new.notification.push('Nieuw bericht!', f'{r1} heeft je een nieuw bericht gestuurd. Klik om te bekijken!', toUser)
-        
-        return jsonify(
-            code='sent',
-            msg='Your message has been sent!',
-            time = Time,
-        ), 200
-    
-    @app.route('/messages/query/<Friend>', methods=['GET'])
-    def queryMessage(Friend):
-        token = request.headers.get('auth')
-        UserID = get.token.session(token)
-
-        if UserID is None:
-            return jsonify(
-                msg='Unauthorized!',
-                code='unauthorized',
-            ), 401
-        with con.cursor() as cur:
-            cur.execute('''SELECT * FROM ptu WHERE User02 = %s AND User01 = %s''', (UserID, Friend,))
-            r1 = cur.fetchone()
-            if r1: return jsonify(
-                code='new_messages_available',
-                msg='New messages are available!'
-            ), 200
-            else: return jsonify(
-                code = 'no_new_messages',
-                msg = 'There are no new messages available!'
-            ), 400
-
-    @app.route('/messages/read/<Friend>', methods=['GET'])
-    def readMessages(Friend):
-        token = request.headers.get('auth')
-        UserID = get.token.session(token)
-
-        if UserID is None:
-            return jsonify(
-                msg='Unauthorized!',
-                code='unauthorized',
-            ), 401
-        global con;
-        with con.cursor() as cur:
-            cur.execute('''SELECT Path FROM ptu WHERE User02 = %s''', (UserID,))
-            r1 = cur.fetchone()
-
-            if r1 is None:
+            if UserID is None:
                 return jsonify(
-                    code='no_new',
-                    msg='There where no new messages.'
-                ), 400
+                    msg='Unauthorized!',
+                    code='unauthorized',
+                ), 401
             
-            cur.execute('''DELETE FROM ptu WHERE User02 = %s''', (UserID,))
-            con.commit()
+            cur.execute('''SELECT User01, User02 FROM friends WHERE User01 = %s OR User02 = %s''', (UserID, UserID))
+            r1 = cur.fetchone()[0]
+            r2 = cur.fetchone()[1]
+            if r1 or r2 != Recv: return jsonify(
+                msg='Unauthorized!',
+                code='unauthorized',
+            ), 401
 
-            try:
-                # deepcode ignore PT: This sends a file, does not import a file or changes anything to the source.
-                return send_file(str(r1[0]))
-            except FileNotFoundError:
+            if Type == 'txt':
+                Type = 'text'
+                log.debug('Starting operation for messaging')
+                cur.execute('''INSERT INTO messages (User01, User02, Content, Time, Type,) VALUES (%s, %s, %s, %s, %s,)''', (UserID, Recv, Content, Time, Type,))
+                con.commit()
                 return jsonify(
-                    code='no_new_file',
-                    msg='There where no new messages.'
-                ), 400
-            finally:
-                os.remove(str(r1[0]))
+                    code='Success',
+                    msg='Your message was successfully sent!',
+                ), 200
+            elif Type == 'img':
+                log.debug('Starting operation for sending images')
+                return 'Unimplemented!', 400
+            else: return jsonify(
+                    msg='Unauthorized!',
+                    code='unauthorized',
+                ), 401
+
+    @app.route('/messages/load', methods=['GET'])
+    def readMessages():
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+        FriendID = request.args.get('UserID')
+
+        if UserID is None:
+            return jsonify(
+                msg='Unauthorized!',
+                code='unauthorized',
+            ), 401
+    
+        with con.cursor() as cur:
+            cur.execute('''SELECT * FROM messages WHERE (User01 = %s AND User02 = %s) OR (User01 = %s AND User02 = %s)''', (UserID, FriendID, FriendID, UserID));
+            messages = cur.fetchall();
+            dataContent = []
+            for message in messages:
+                JSON = {
+                    "author": {
+                        "firstName": message['firstName'],
+                        "id": message['User01'],
+                    },
+                    "createdAt": message['Time'],
+                    "id": message['id'],
+                    "text": message['text'],
+                    "type": message['type']
+                }
+                
+                dataContent.append(JSON)
+
+            dataContent = json.dump(dataContent)
+
+            return dataContent
 
 class settings:
     @app.route('/add/FCMToken', methods=['POST'])
@@ -684,6 +654,21 @@ class settings:
                 code='Success',
                 url=r1[0],
             ), 200
+    @app.route('/data/id', methods=['GET'])
+    def GetUserID():
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+
+        if(UserID is None): return jsonify(
+                msg = 'Unauthorized!',
+                code = 'unauthorized',
+            ), 401
+        
+        return jsonify(
+            code='Success',
+            msg='Fetched UserID',
+            ID=UserID,
+        )
 
 if __name__ == '__main__':
     app.run()
