@@ -571,7 +571,7 @@ class message:
             ), 401
     
         with con.cursor() as cur:
-            cur.execute('''SELECT * FROM messages WHERE (User01 = %s AND User02 = %s) OR (User01 = %s AND User02 = %s)''', (UserID, FriendID, FriendID, UserID))
+            cur.execute('''SELECT * FROM messages WHERE ( "User01" = %s AND "User02" = %s) OR ( "User01" = %s AND "User02" = %s)''', (UserID, FriendID, FriendID, UserID))
             messages = cur.fetchall();
             dataContent = []
             for message in messages:
