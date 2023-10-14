@@ -545,7 +545,7 @@ class message:
 
             if Type == 'txt':
                 log.debug('Starting operation for messaging')
-                cur.execute('''INSERT INTO messages (User01, User02, Content, Time, Type,) VALUES (%s, %s, %s, %s, %s,)''', (UserID, Recv, Content, Time, Type,))
+                cur.execute('''INSERT INTO messages (User01, User02, Content, Time, Type) VALUES (%s, %s, %s, %s, %s,)''', (UserID, Recv, Content, Time, Type,))
                 con.commit()
                 return jsonify(
                     code='Success',
