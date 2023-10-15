@@ -555,7 +555,10 @@ class message:
                         auth=WSPASSKEY,
                         UserID=UserID,
                     ),
-                    headers={'Content-Type': 'application/json'}
+                    headers={
+                        'Content-Type': 'application/json',
+                        'User-agent': 'ORAE Network Service'
+                    }
                 )
                 return jsonify(
                     code='Success',
