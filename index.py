@@ -547,7 +547,7 @@ class message:
             if Type == 'txt':
                 cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, Content, Time, Type,))
                 con.commit()
-                requests.post(
+                requestData = requests.post(
                     'https://live.orae.one/howdy/api',
                     data={
                         'auth': WSPASSKEY,
@@ -558,6 +558,10 @@ class message:
                         'User-agent': 'ORAE Network Service'
                     }
                 )
+
+                log.debug(requestData.status_code)
+                log.debug(requestData.raw)
+
                 cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (UserID,))
                 RecvName = (cur.fetchone())[0]
                 if len(Content) <= 20: ContentNoti = Content
