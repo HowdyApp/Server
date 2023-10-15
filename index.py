@@ -539,14 +539,12 @@ class message:
             cur.execute('''SELECT User01, User02 FROM friends WHERE User01 = %s OR User02 = %s''', (UserID, UserID))
             r1 = cur.fetchone()
             if r1 and (r1[0] == Recv or r1[1] == Recv):
-                log.debug('Unauthorized! --> User did not match Channel.')
                 return jsonify(
                     msg='Unauthorized!',
                     code='unauthorized',
                 ), 401
 
             if Type == 'txt':
-                log.debug('Starting operation for messaging')
                 cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, Content, Time, Type,))
                 con.commit()
                 requests.post(
@@ -570,7 +568,6 @@ class message:
                     msg='Your message was successfully sent!',
                 ), 200
             elif Type == 'img':
-                log.debug('Starting operation for sending images')
                 return 'Unimplemented!', 400
             else: return jsonify(
                     msg='Unauthorized!',
@@ -642,7 +639,6 @@ class settings:
         token = request.headers.get('auth')
         UserID = get.token.session(token)
         GetID = request.args.get('ID')
-        log.debug(GetID)
         
         if(UserID is None): return jsonify(
                 msg = 'Unauthorized!',
