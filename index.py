@@ -567,9 +567,9 @@ class message:
                     msg='Your message was successfully sent!',
                 ), 200
             elif Type == 'img':
-                cur.execute('''SELECT id FROM messages WHERE User01 = %s''', (UserID,))
+                cur.execute('''SELECT id FROM messages WHERE "User01" = %s''', (UserID,))
                 if cur.fetchone():
-                    cur.execute('''DELETE FROM messages WHERE User01 = %s''', (UserID,))
+                    cur.execute('''DELETE FROM messages WHERE "User01" = %s''', (UserID,))
                     con.commit()
                 
                 ImageID = str(uuid.uuid4())
