@@ -560,6 +560,11 @@ class message:
                         'User-agent': 'ORAE Network Service'
                     }
                 )
+                cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (UserID,))
+                RecvName = (cur.fetchone())[0]
+                if len(Content) <= 20: ContentNoti = Content
+                else: ContentNoti = Content[:20] + '...'
+                new.notification.push(RecvName, ContentNoti, Recv)
                 return jsonify(
                     code='Success',
                     msg='Your message was successfully sent!',
