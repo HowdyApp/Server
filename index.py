@@ -551,10 +551,10 @@ class message:
                 con.commit()
                 requests.post(
                     'https://live.orae.one/howdy/api',
-                    data=jsonify(
-                        auth=WSPASSKEY,
-                        UserID=UserID,
-                    ),
+                    data={
+                        'auth': WSPASSKEY,
+                        'UserID': UserID,
+                    },
                     headers={
                         'Content-Type': 'application/json',
                         'User-agent': 'ORAE Network Service'
