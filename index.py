@@ -271,7 +271,6 @@ class account:
         shutil.rmtree(f'./images/{UserID}')
         
         with con.cursor() as cur:
-            cur.execute('DELETE FROM ptu WHERE User01 = %s', (UserID));
             cur.execute('DELETE FROM images WHERE UserID = %s', (UserID));
 
         return jsonify(
@@ -547,7 +546,7 @@ class message:
             if Type == 'txt':
                 cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, Content, Time, Type,))
                 con.commit()
-                requestData = requests.post(
+                requests.post(
                     'https://live.orae.one/howdy/api',
                     data=json.dumps({
                         'auth': WSPASSKEY,
@@ -568,7 +567,38 @@ class message:
                     msg='Your message was successfully sent!',
                 ), 200
             elif Type == 'img':
-                return 'Unimplemented!', 400
+                ImageID = str(uuid.uuid4())
+                path = f'./images/{UserID}/{ImageID}.jpg'
+                directory = os.path.dirname(path)
+                TTI = (uuid.uuid4() + '-' + uuid.uuid4() + '-' + uuid.uuid4() + '-' + uuid.uuid4() + '-' + uuid.uuid4())
+
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+                with open(path, "wb") as ws:
+                    ws.write(base64.decodebytes(Content))
+                cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, f'https://howdy.orae.one/{TTI}', Time, Type,))
+                cur.execute('''INSERT INTO images ( "UserID", "ImageID", "path", "UUID" ) VALUES (%s, %s, %s)''', (UserID, ImageID, path, TTI))
+                con.commit()
+                requests.post(
+                    'https://live.orae.one/howdy/api',
+                    data=json.dumps({
+                        'auth': WSPASSKEY,
+                        'UserID': Recv,
+                    }),
+                    headers={
+                        'Content-Type': 'application/json',
+                        'User-agent': 'ORAE Network Service'
+                    }
+                )
+                cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (UserID,))
+                RecvName = (cur.fetchone())[0]
+                if len(Content) <= 20: ContentNoti = Content
+                else: ContentNoti = Content[:20] + '...'
+                new.notification.push(RecvName, ContentNoti, Recv)
+                return jsonify(
+                    code='Success',
+                    msg='Your image was successfully sent!',
+                ), 200
             else: return jsonify(
                     msg='Unauthorized!',
                     code='unauthorized',
@@ -594,22 +624,65 @@ class message:
                 LocalUserID = message[1]
                 cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (LocalUserID,))
                 Username = cur.fetchone()[0]
-                JSON = {
-                    "author": {
-                        "firstName": Username,
-                        "id": message[1],
-                    },
-                    "createdAt": int(message[4]),
-                    "id": int(message[0]),
-                    "text": message[3],
-                    "type": message[5]
-                }
+                if (message[5]) == 'txt':
+                    JSON = {
+                        "author": {
+                            "firstName": Username,
+                            "id": message[1],
+                        },
+                        "createdAt": int(message[4]),
+                        "id": int(message[0]),
+                        "text": message[3],
+                        "type": message[5]
+                    }
+                if (message[5]) == 'img':
+                    JSON = {
+                        "author": {
+                            "firstName": Username,
+                            "id": message[1],
+                        },
+                        "createdAt": int(message[4]),
+                        "id": int(message[0]),
+                        "uri": 'https://cdn.orae.one/Howdy/App/Assets/watched-nl.png',
+                        "type": message[5]
+                    }
                 
                 dataContent.append(JSON)
 
             dataContent = json.dumps(dataContent)
 
             return dataContent
+
+    @app.route('/messages/query', methods=['POST'])
+    def queryMessages():
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+        data = request.get_json();
+        FriendID = data['ID']
+
+        with con.cursor() as cur:
+            cur.execute('''SELECT Type FROM messages WHERE User01 = %s AND User02 = %s''', (UserID, FriendID))
+            r1 = cur.fetchall()
+            if 'img' in r1: final = 'img'
+            elif 'txt' in r1: final = 'txt' if not final else 'txt + img'
+            else: final = ''
+        
+        return jsonify(
+            code='Success',
+            msg='Done!',
+            new = final
+        )
+
+
+    @app.route('/messages/img/<TTI>', methods=['GET'])
+    def messageIMG(ID):
+        with con.cursor() as cur:
+            cur.execute('''SELECT path FROM images WHERE UUID = %s''', (ID))
+        
+        try: return send_file((cur.fetchone())[0])
+        except: return 'Something went wrong!'
+        finally: os.remove(str((cur.fetchone())[0]))
+
 
 class settings:
     @app.route('/add/FCMToken', methods=['POST'])
