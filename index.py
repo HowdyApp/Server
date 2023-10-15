@@ -583,7 +583,7 @@ class message:
                 with open(path, "wb") as ws:
                     ws.write(base64.decodebytes(Content))
                 cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, f'https://cdn.orae.one/Howdy/App/Assets/watched-nl.png', Time, Type,))
-                cur.execute('''INSERT INTO images ( "UserID", "ImageID", "path" ) VALUES (%s, %s, %s)''', (UserID, ImageID, path,))
+                cur.execute('''INSERT INTO images ( "userid", "imageid", "path" ) VALUES (%s, %s, %s)''', (UserID, ImageID, path,))
                 cur.execute('''INSERT INTO imessagery ( "User01", "User02", "ImageID", "Path",) VALUES (%s, %s, %s, %s)''', (UserID, Recv, ImageID, path,))
                 con.commit()
                 requests.post(
