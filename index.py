@@ -648,7 +648,7 @@ class message:
                         },
                         "createdAt": int(message[4]),
                         "id": int(message[0]),
-                        "uri": 'https://source.unsplash.com/random/?friends',
+                        "uri": message[3],
                         "type": message[5]
                     }
                 
