@@ -567,17 +567,23 @@ class message:
                     msg='Your message was successfully sent!',
                 ), 200
             elif Type == 'img':
+                cur.execute('''SELECT id FROM messages WHERE User01 = %s''', (UserID))
+                if cur.fetchone():
+                    cur.execute('''DELETE FROM messages WHERE User01 = %s''', (UserID))
+                    con.commit()
+                
                 ImageID = str(uuid.uuid4())
                 path = f'./images/{UserID}/{ImageID}.jpg'
+
                 directory = os.path.dirname(path)
-                TTI = (uuid.uuid4() + '-' + uuid.uuid4() + '-' + uuid.uuid4() + '-' + uuid.uuid4() + '-' + uuid.uuid4())
 
                 if not os.path.exists(directory):
                     os.makedirs(directory)
                 with open(path, "wb") as ws:
                     ws.write(base64.decodebytes(Content))
-                cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, f'https://howdy.orae.one/{TTI}', Time, Type,))
-                cur.execute('''INSERT INTO images ( "UserID", "ImageID", "path", "UUID" ) VALUES (%s, %s, %s)''', (UserID, ImageID, path, TTI))
+                cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, f'https://cdn.orae.one/Howdy/App/Assets/watched-nl.png', Time, Type,))
+                cur.execute('''INSERT INTO images ( "UserID", "ImageID", "path" ) VALUES (%s, %s, %s)''', (UserID, ImageID, path))
+                cur.execute('''INSERT INTO imessagery ( "User01", "User02", "ImageID", "Path",) VALUES (%s, %s, %s, %s)''', (UserID, Recv, ImageID, path))
                 con.commit()
                 requests.post(
                     'https://live.orae.one/howdy/api',
@@ -643,7 +649,7 @@ class message:
                         },
                         "createdAt": int(message[4]),
                         "id": int(message[0]),
-                        "uri": 'https://cdn.orae.one/Howdy/App/Assets/watched-nl.png',
+                        "uri": message[3],
                         "type": message[5]
                     }
                 
@@ -674,10 +680,18 @@ class message:
         )
 
 
-    @app.route('/messages/img/<TTI>', methods=['GET'])
+    @app.route('/messages/img/<FriendID>', methods=['GET'])
     def messageIMG(ID):
+        token = request.headers.get('auth')
+        UserID = get.token.session(token)
+
+        if(UserID is None): return jsonify(
+                msg = 'Unauthorized!',
+                code = 'unauthorized',
+            ), 401
+
         with con.cursor() as cur:
-            cur.execute('''SELECT path FROM images WHERE UUID = %s''', (ID))
+            cur.execute('''SELECT Path FROM imessagery WHERE User01 = %s AND User02 = %s''', (ID, UserID))
         
         try: return send_file((cur.fetchone())[0])
         except: return 'Something went wrong!'
