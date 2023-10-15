@@ -11,13 +11,13 @@ from flask import jsonify
 from flask import send_file
 from flask import send_from_directory
 from flask_cors import CORS
-import os
-import psycopg2 
 
 from lib import new
 from lib import log
 from lib import get
 
+import psycopg2 
+import requests
 import base64
 import uuid
 import json
@@ -26,11 +26,13 @@ import dotenv
 import datetime
 import time
 import re
+import os
 
 DBUSERNAME = dotenv.get_key('/app/storage/db.key', 'username')
 DBPASSWORD = dotenv.get_key('/app/storage/db.key', 'password')
 DBHOSTNAME = dotenv.get_key('/app/storage/db.key', 'host')
 DBHOSTPORT = dotenv.get_key('/app/storage/db.key', 'port')
+WSPASSKEY = dotenv.get_key('/app/storage/redis.key', 'password')
 
 con = psycopg2.connect(
     dbname='main',
@@ -547,6 +549,14 @@ class message:
                 log.debug('Starting operation for messaging')
                 cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, Content, Time, Type,))
                 con.commit()
+                requests.post(
+                    'https://live.orae.one/howdy/api',
+                    data=jsonify(
+                        auth=WSPASSKEY,
+                        UserID=UserID,
+                    ),
+                    headers={'Content-Type': 'application/json'}
+                )
                 return jsonify(
                     code='Success',
                     msg='Your message was successfully sent!',
