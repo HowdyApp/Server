@@ -549,10 +549,10 @@ class message:
                 con.commit()
                 requestData = requests.post(
                     'https://live.orae.one/howdy/api',
-                    data={
+                    data=json.dumps({
                         'auth': WSPASSKEY,
                         'UserID': UserID,
-                    },
+                    }),
                     headers={
                         'Content-Type': 'application/json',
                         'User-agent': 'ORAE Network Service'
@@ -560,7 +560,7 @@ class message:
                 )
 
                 log.debug(requestData.status_code)
-                log.debug(requestData.raw)
+                log.debug(requestData.json())
 
                 cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (UserID,))
                 RecvName = (cur.fetchone())[0]
