@@ -567,6 +567,7 @@ class message:
                     msg='Your message was successfully sent!',
                 ), 200
             elif Type == 'img':
+                Content = Content.encode()
                 cur.execute('''SELECT id FROM messages WHERE "User01" = %s''', (UserID,))
                 if cur.fetchone():
                     cur.execute('''DELETE FROM messages WHERE "User01" = %s''', (UserID,))
