@@ -535,7 +535,7 @@ class message:
                     code='unauthorized',
                 ), 401
             
-            cur.execute('''SELECT User01, User02 FROM friends WHERE User01 = %s OR User02 = %s''', (UserID, UserID))
+            cur.execute('''SELECT User01, User02 FROM friends WHERE User01 = %s OR User02 = %s''', (UserID, UserID,))
             r1 = cur.fetchone()
             if r1 and (r1[0] == Recv or r1[1] == Recv):
                 return jsonify(
@@ -582,8 +582,8 @@ class message:
                 with open(path, "wb") as ws:
                     ws.write(base64.decodebytes(Content))
                 cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, f'https://cdn.orae.one/Howdy/App/Assets/watched-nl.png', Time, Type,))
-                cur.execute('''INSERT INTO images ( "UserID", "ImageID", "path" ) VALUES (%s, %s, %s)''', (UserID, ImageID, path))
-                cur.execute('''INSERT INTO imessagery ( "User01", "User02", "ImageID", "Path",) VALUES (%s, %s, %s, %s)''', (UserID, Recv, ImageID, path))
+                cur.execute('''INSERT INTO images ( "UserID", "ImageID", "path" ) VALUES (%s, %s, %s)''', (UserID, ImageID, path,))
+                cur.execute('''INSERT INTO imessagery ( "User01", "User02", "ImageID", "Path",) VALUES (%s, %s, %s, %s)''', (UserID, Recv, ImageID, path,))
                 con.commit()
                 requests.post(
                     'https://live.orae.one/howdy/api',
@@ -623,7 +623,7 @@ class message:
             ), 401
     
         with con.cursor() as cur:
-            cur.execute('''SELECT * FROM messages WHERE ( "User01" = %s AND "User02" = %s) OR ( "User01" = %s AND "User02" = %s)''', (UserID, FriendID, FriendID, UserID))
+            cur.execute('''SELECT * FROM messages WHERE ( "User01" = %s AND "User02" = %s) OR ( "User01" = %s AND "User02" = %s)''', (UserID, FriendID, FriendID, UserID,))
             messages = cur.fetchall();
             dataContent = []
             for message in messages:
@@ -667,7 +667,7 @@ class message:
         FriendID = data['ID']
 
         with con.cursor() as cur:
-            cur.execute('''SELECT Type FROM messages WHERE User01 = %s AND User02 = %s''', (UserID, FriendID))
+            cur.execute('''SELECT Type FROM messages WHERE User01 = %s AND User02 = %s''', (UserID, FriendID,))
             r1 = cur.fetchall()
             if 'img' in r1: final = 'img'
             elif 'txt' in r1: final = 'txt' if not final else 'txt + img'
@@ -691,7 +691,7 @@ class message:
             ), 401
 
         with con.cursor() as cur:
-            cur.execute('''SELECT Path FROM imessagery WHERE User01 = %s AND User02 = %s''', (ID, UserID))
+            cur.execute('''SELECT Path FROM imessagery WHERE User01 = %s AND User02 = %s''', (ID, UserID,))
         
         try: return send_file((cur.fetchone())[0])
         except: return 'Something went wrong!'
@@ -713,7 +713,7 @@ class settings:
         
         with con.cursor() as cur:
             cur.execute('''INSERT INTO FCMToken (UserID, Token) VALUES (%s, %s) 
-                        ON CONFLICT (UserID) DO UPDATE SET Token = EXCLUDED.Token''', (UserID, NotiToken))
+                        ON CONFLICT (UserID) DO UPDATE SET Token = EXCLUDED.Token''', (UserID, NotiToken,))
             con.commit()
 
         return jsonify(
