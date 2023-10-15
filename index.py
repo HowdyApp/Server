@@ -558,10 +558,6 @@ class message:
                         'User-agent': 'ORAE Network Service'
                     }
                 )
-
-                log.debug(requestData.status_code)
-                log.debug(requestData.json())
-
                 cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (UserID,))
                 RecvName = (cur.fetchone())[0]
                 if len(Content) <= 20: ContentNoti = Content
