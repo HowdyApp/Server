@@ -698,10 +698,11 @@ class message:
 
         with con.cursor() as cur:
             cur.execute('''SELECT "Path" FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID,))
+            path = (cur.fetchone())[0]
         
-        try: return send_file((cur.fetchone())[0])
+        try: return send_file(path)
         except: return 'Something went wrong!'
-        finally: os.remove(str((cur.fetchone())[0]))
+        finally: os.remove(path)
 
 
 class settings:
