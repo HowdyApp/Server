@@ -445,6 +445,7 @@ class friends:
                 msg='Unauthorized!',
                 code='unauthorized',
             ), 401
+        
 
         with con.cursor() as cur:
             cur.execute('''SELECT username FROM auth WHERE userid = %s''', (FriendID,))
@@ -473,11 +474,17 @@ class friends:
         # 3 = Active Friend
         #? --- INFO ---
 
+
+        with con.cursor() as cur:
+            cur.execute('''SELECT slogan FROM auth WHERE userid = %s''', (FriendID))
+            slogan = cur.fetchone()
+
         return jsonify(
             code = 'accepted',
             msg = 'Load user information!',
             name = r1,
             status = status,
+            slogan = slogan,
         ), 200
 
     @app.route('/friends/list', methods=['GET'])
