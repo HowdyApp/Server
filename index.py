@@ -672,7 +672,9 @@ class message:
             
             for row in r1:
                 if 'img' in row:
-                    final = 'img'
+                    cur.execute('''SELECT "Path" FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID,))
+                    if cur.fetchone() != None:
+                        final = 'img'
                 elif 'txt' in row:
                     if final:
                         final = 'txt + img'
@@ -702,7 +704,8 @@ class message:
         
         try: return send_file(path)
         except: return 'Something went wrong!'
-        finally: os.remove(path)
+        finally:
+            os.remove(path)
 
 
 class settings:
