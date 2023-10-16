@@ -697,7 +697,7 @@ class message:
             ), 401
 
         with con.cursor() as cur:
-            cur.execute('''SELECT Path FROM imessagery WHERE User01 = %s AND User02 = %s''', (FriendID, UserID,))
+            cur.execute('''SELECT "Path" FROM imessagery WHERE User01 = %s AND User02 = %s''', (FriendID, UserID,))
         
         try: return send_file((cur.fetchone())[0])
         except: return 'Something went wrong!'
