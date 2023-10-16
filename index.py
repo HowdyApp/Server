@@ -542,6 +542,14 @@ class message:
                     msg='Unauthorized!',
                     code='unauthorized',
                 ), 401
+            
+            cur.execute('''
+                UPDATE auth
+                SET score = score + 1
+                WHERE UserID = %s;
+            ''', (UserID,))
+
+            con.commit()
 
             if Type == 'txt':
                 cur.execute('''INSERT INTO messages ( "User01", "User02", "Content", "Time", "Type") VALUES (%s, %s, %s, %s, %s)''', (UserID, Recv, Content, Time, Type,))
