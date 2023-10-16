@@ -668,9 +668,9 @@ class message:
         with con.cursor() as cur:
             cur.execute('''SELECT "Type" FROM messages WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID,))
             r1 = cur.fetchall()
+            final = ''
             if 'img' in r1: final = 'img'
             elif 'txt' in r1: final = 'txt' if not final else 'txt + img'
-            else: final = ''
         
         return jsonify(
             code='Success',
