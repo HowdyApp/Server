@@ -483,7 +483,7 @@ class friends:
 
         with con.cursor() as cur:
             cur.execute('''SELECT slogan FROM auth WHERE userid = %s''', (FriendID,))
-            slogan = cur.fetchone()
+            slogan = (cur.fetchone())[0]
 
         return jsonify(
             code = 'accepted',
