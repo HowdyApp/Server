@@ -447,7 +447,7 @@ class friends:
             ), 401
         
         with con.cursor() as cur:
-            cur.execute('''SELECT "id" FROM friends WHERE ("User01" = %s AND "User02" = %s) OR ("User02"= %s AND "User01" = %s)''', (UserID, FriendID, UserID, FriendID))
+            cur.execute('''SELECT "id" FROM friends WHERE ("user01" = %s AND "user02" = %s) OR ("user02"= %s AND "user01" = %s)''', (UserID, FriendID, UserID, FriendID))
             if cur.fetchone() == None: return jsonify(
                 msg='Unauthorized!',
                 code='unauthorized',
