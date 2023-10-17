@@ -473,6 +473,7 @@ class friends:
                 r2 = cur.fetchone()
                 if r2:
                     r2 = 3
+                    status = 3
 
         #? --- INFO ---
         # 1 = Send
