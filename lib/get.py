@@ -44,10 +44,10 @@ class password:
             if not isinstance(database, (str, bytes)):
                 raise ValueError("The database-pw must be a string or bytes")
 
-            if isinstance(password, bytes):
-                password = password.decode()
-            if isinstance(database, bytes):
-                database = database.decode()
+            if isinstance(password, str):
+                password = password.encode()
+            if isinstance(database, str):
+                database = database.encode()
 
             return bcrypt.checkpw(password, database)
         except Exception as e:
