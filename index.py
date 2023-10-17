@@ -695,7 +695,7 @@ class message:
             for row in r1:
                 if 'img' in row:
                     cur.execute('''SELECT "Path" FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID,))
-                    if cur.fetchone() != None:
+                    if(os.path.isfile((cur.fetchone())[0])):
                         final = 'img'
                 elif 'txt' in row:
                     if final:
