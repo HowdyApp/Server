@@ -706,9 +706,10 @@ class message:
                 if 'img' in row:
                     cur.execute('''SELECT "Path" FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID,))
                     for path in cur.fetchall():
-                        log.notice('SKIPPED: Request has been skipped because the requested image does not exist anymore.')
-                        if(os.path.isfile(path)):
+                        if(os.path.isfile(path[0])):
                             final = 'img'
+                        else:
+                            log.notice('SKIPPED: Request has been skipped to prevent errors on upcoming requests.')
                 elif 'txt' in row:
                     if final:
                         final = 'txt + img'
