@@ -236,7 +236,8 @@ class account:
     @app.route('/account/profile/set', methods=['POST'])
     def setProfile():
         data = request.get_json()
-        url = data['url']
+        url = data.get('url')
+        slogan = data.get('slogan')
         token = request.headers.get('auth')
         UserID = get.token.session(token)
 
@@ -246,17 +247,27 @@ class account:
                 code = 'unauthorized',
             ), 401
         
-        if not re.match(r'^https://avataaars\.io', url): return jsonify(
-                msg = 'Unauthorized!',
-                code = 'unauthorized',
-            ), 401
-        with con.cursor() as cur:
-            cur.execute('''UPDATE auth SET profilepicture = %s WHERE userid = %s''', (url, UserID))
-            con.commit()        
-        return jsonify(
-            code='success',
-            msg='User profile updated successfully!'
-        )
+        if url:
+            if not re.match(r'^https://avataaars\.io', url): return jsonify(
+                    msg = 'Unauthorized!',
+                    code = 'unauthorized',
+                ), 401
+            with con.cursor() as cur:
+                cur.execute('''UPDATE auth SET profilepicture = %s WHERE userid = %s''', (url, UserID))
+                con.commit()        
+            return jsonify(
+                code='success',
+                msg='User profile updated successfully!'
+            )
+        if slogan:
+            slogan[:12]
+            with con.cursor() as cur:
+                cur.execute('''UPDATE auth SET slogan = %s WHERE userid = %s''', (slogan, UserID))
+                con.commit()        
+            return jsonify(
+                code='success',
+                msg='User profile updated successfully!'
+            )
     
     @app.route('/account/deleteImages')
     def deleteImages():
