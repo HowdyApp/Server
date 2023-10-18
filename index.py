@@ -687,9 +687,8 @@ class message:
                         }
 
                     dataContent.append(JSON)
-                    dataContent = json.dumps(dataContent)
-
-
+            
+            dataContent = json.dumps(dataContent)
             return dataContent
 
     @app.route('/messages/query', methods=['POST'])
