@@ -662,31 +662,35 @@ class message:
                 LocalUserID = message[1]
                 cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (LocalUserID,))
                 Username = cur.fetchone()[0]
-                dataContent = []
-                if (message[5]) == 'txt':
-                    JSON = {
-                        "author": {
-                            "firstName": Username,
-                            "id": message[1],
-                        },
-                        "createdAt": int(message[4]),
-                        "id": int(message[0]),
-                        "text": message[3],
-                        "type": message[5]
-                    }
-                if (message[5]) == 'img':
-                    JSON = {
-                        "author": {
-                            "firstName": Username,
-                            "id": message[1],
-                        },
-                        "createdAt": int(message[4]),
-                        "id": int(message[0]),
-                        "uri": message[3],
-                        "type": message[5]
-                    }
-                dataContent.append(JSON)
-                dataContent = json.dumps(dataContent)
+
+                if(message[5]):
+                    if (message[5]) == 'txt':
+                        JSON = {
+                            "author": {
+                                "firstName": Username,
+                                "id": message[1],
+                            },
+                            "createdAt": int(message[4]),
+                            "id": int(message[0]),
+                            "text": message[3],
+                            "type": message[5]
+                        }
+                    if (message[5]) == 'img':
+                        JSON = {
+                            "author": {
+                                "firstName": Username,
+                                "id": message[1],
+                            },
+                            "createdAt": int(message[4]),
+                            "id": int(message[0]),
+                            "uri": message[3],
+                            "type": message[5]
+                        }
+                    else:
+                        JSON = {}
+                    
+                    dataContent.append(JSON)
+                    dataContent = json.dumps(dataContent)
 
             return dataContent
 
