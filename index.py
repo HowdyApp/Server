@@ -711,7 +711,7 @@ class message:
                         else:
                             log.notice('SKIPPED: Request has been skipped to prevent errors on upcoming requests.')
                 elif 'txt' in row:
-                    if final:
+                    if 'img' in final:
                         final = 'txt + img'
                     else:
                         final = 'txt'
