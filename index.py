@@ -686,11 +686,12 @@ class message:
                             "uri": message[3],
                             "type": message[5]
                         }
+
+                        dataContent.append(JSON)
+                        dataContent = json.dumps(dataContent)
                     else:
-                        JSON = []
-                    
-                    dataContent.append(JSON)
-                    dataContent = json.dumps(dataContent)
+                        dataContent = []
+                        dataContent = json.dumps(dataContent)
 
             return dataContent
 
