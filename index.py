@@ -607,7 +607,7 @@ class message:
                     con.commit()
                 
                 ImageID = str(uuid.uuid4())
-                path = f'./images/{UserID}/{ImageID}.jpg'
+                path = f'/app/images/{UserID}/{ImageID}.jpg'
 
                 directory = os.path.dirname(path)
 
@@ -685,8 +685,7 @@ class message:
                         "type": message[5]
                     }
                 
-                dataContent.append(JSON)
-
+            dataContent.append(JSON)
             dataContent = json.dumps(dataContent)
 
             return dataContent
@@ -706,7 +705,10 @@ class message:
             for row in r1:
                 if 'img' in row:
                     cur.execute('''SELECT "Path" FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID,))
-                    if(os.path.isfile((cur.fetchone())[0])):
+                    path = cur.fetchone()[0]
+                    log.debug(path)
+                    if(os.path.isfile(path)):
+                        log.debug((path + 'is found!'))
                         final = 'img'
                 elif 'txt' in row:
                     if final:
