@@ -706,9 +706,7 @@ class message:
                 if 'img' in row:
                     cur.execute('''SELECT "Path" FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID,))
                     path = cur.fetchone()[0]
-                    log.debug(path)
                     if(os.path.isfile(path)):
-                        log.debug((path + 'is found!'))
                         final = 'img'
                 elif 'txt' in row:
                     if final:
@@ -735,7 +733,7 @@ class message:
 
         with con.cursor() as cur:
             cur.execute('''SELECT "Path" FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID,))
-            path = f'/app/{(cur.fetchone())[0]}'
+            path = cur.fetchone()[0]
         
         try:
             return send_file(path)
