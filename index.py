@@ -687,7 +687,7 @@ class message:
                             "type": message[5]
                         }
                     else:
-                        JSON = {}
+                        JSON = []
                     
                     dataContent.append(JSON)
                     dataContent = json.dumps(dataContent)
