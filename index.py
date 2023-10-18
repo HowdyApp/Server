@@ -662,6 +662,7 @@ class message:
                 LocalUserID = message[1]
                 cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (LocalUserID,))
                 Username = cur.fetchone()[0]
+                dataContent = []
                 if (message[5]) == 'txt':
                     JSON = {
                         "author": {
@@ -684,9 +685,8 @@ class message:
                         "uri": message[3],
                         "type": message[5]
                     }
-                if (message[5]):
-                    dataContent.append(JSON)
-                    dataContent = json.dumps(dataContent)
+                dataContent.append(JSON)
+                dataContent = json.dumps(dataContent)
 
             return dataContent
 
