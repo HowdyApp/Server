@@ -741,7 +741,8 @@ class message:
             return 'Something went wrong!'
         finally:
             os.remove(path)
-            cur.execute('''DELETE FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID))
+            with con.cursor() as cur:
+                cur.execute('''DELETE FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID))
 
 
 class settings:
