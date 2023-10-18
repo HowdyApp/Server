@@ -737,9 +737,11 @@ class message:
         
         try:
             return send_file(path)
-        except: return 'Something went wrong!'
+        except:
+            return 'Something went wrong!'
         finally:
             os.remove(path)
+            cur.execute('''DELETE FROM imessagery WHERE "User01" = %s AND "User02" = %s''', (FriendID, UserID))
 
 
 class settings:
