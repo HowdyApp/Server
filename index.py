@@ -663,6 +663,13 @@ class message:
         with con.cursor() as cur:
             cur.execute('''SELECT * FROM messages WHERE ( "User01" = %s AND "User02" = %s) OR ( "User01" = %s AND "User02" = %s)''', (UserID, FriendID, FriendID, UserID,))
             messages = cur.fetchall();
+            
+            #? For update v0.8.5 - Delete loaded messages for support of new messages and security. 🔒
+            #! ---
+            cur.execute('''DELETE FROM messages WHERE ( "User01" = %s AND "User02" = %s ) ''', (FriendID, UserID,))
+            con.commit()
+            #! ---
+
             dataContent = []
             for message in messages:
                 LocalUserID = message[1]
