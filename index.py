@@ -279,10 +279,16 @@ class account:
                 code = 'unauthorized',
             ), 401
         
-        shutil.rmtree(f'./images/{UserID}')
+        try:
+            shutil.rmtree(f'./images/{UserID}')
         
-        with con.cursor() as cur:
-            cur.execute('DELETE FROM images WHERE UserID = %s', (UserID,));
+            with con.cursor() as cur:
+                cur.execute('DELETE FROM images WHERE UserID = %s', (UserID,));
+        except:
+            return jsonify(
+                code='Failed',
+                msg='Directory does not exist. Skipping, and continuing because there is no problem with this request.'
+            ), 200
 
         return jsonify(
             code='Success',
