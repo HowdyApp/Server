@@ -269,7 +269,7 @@ class account:
                 msg='User profile updated successfully!'
             )
     
-    @app.route('/account/deleteImages')
+    @app.route('/account/deleteImages', methods=['POST'])
     def deleteImages():
         token = request.headers.get('auth')
         UserID = get.token.session(token)
