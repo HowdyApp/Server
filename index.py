@@ -282,7 +282,7 @@ class account:
         shutil.rmtree(f'./images/{UserID}')
         
         with con.cursor() as cur:
-            cur.execute('DELETE FROM images WHERE UserID = %s', (UserID));
+            cur.execute('DELETE FROM images WHERE UserID = %s', (UserID,));
 
         return jsonify(
             code='Success',
