@@ -23,6 +23,7 @@ import uuid
 import json
 import shutil
 import dotenv
+import random
 import datetime
 import time
 import re
@@ -51,11 +52,11 @@ def beforeRequest():
 
 class web:
     @app.route('/')
-    def index(): return send_file('web/main.html')
+    def index(): return send_file('web/main/main.html')
     @app.route('/download')
     def download(): return send_file('app/howdy.apk')
     @app.route('/logo')
-    def logo(): return send_file('web/howdy.png')
+    def logo(): return send_file('web/main/howdy.png')
     @app.route('/terms-of-service')
     def tos(): return send_file('app/legal.txt')
     @app.route('/privacy-policy')
@@ -638,7 +639,8 @@ class message:
                 )
                 cur.execute('''SELECT Username FROM auth WHERE UserID = %s''', (UserID,))
                 RecvName = (cur.fetchone())[0]
-                new.notification.push(RecvName, 'Nieuwe afbeelding, klik om te bekijken!', Recv)
+                ntm = random.randint(0, 3)
+                new.notification.push(RecvName, f'Heeft je een foto gestuurd!', Recv)
                 return jsonify(
                     code='Success',
                     msg='Your image was successfully sent!',
